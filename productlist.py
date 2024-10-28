@@ -33,4 +33,4 @@ df.columns = df.columns.str.strip()
 # Save the modified DataFrame to a new CSV file
 df.to_csv('sales_modified2.csv', index=False)
 
-print("file updated")
+print("file")

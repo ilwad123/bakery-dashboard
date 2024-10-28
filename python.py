@@ -55,8 +55,12 @@ wrong_translated_names = {
     'hibernation': 'Dongmyeon',  
     'Postscript 1': 'Hupyeong 1-dong',
     'Postscript 2nd floor': 'Hupyeong 2-dong',
-    'Pharmacist Myeongdong': 'Yagsamyeongdong',
-    'Postscript 3-dong':'Hupyeong 3-dong'
+    'Pharmacist Myeongdong': 'Yagsamyeong-dong',
+    'Postscript 3-dong':'Hupyeong 3-dong',
+    'Jo Dong-un':'Jo-un-dong',
+    'Kyodong':'Gyo-dong,
+    
+'
 }
 
 df['place'] = df['place'].replace(wrong_translated_names)

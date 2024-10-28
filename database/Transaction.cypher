@@ -8,7 +8,7 @@ CREATE (t:Transaction {
     Total: toFloat(csv.total),
     Place: csv.place,
     Product_Names = split(csv.product_names, ','),//convert these strings into lists
-    Quantity_Per_Product = split(csv.quantities_product, ','),
+    Quantity_Per_Product = split(csv.quantities_product, ','),//convert these strings into lists
     Order_status: csv.`Order status`,
     Location: csv.location
 })
@@ -21,4 +21,3 @@ MERGE (t) - [:CONTAINS] -> (p) //estabilish the relationship
 
 RETURN "Transaction and product connection successful!"
 
-//connect with neighbourhood and driver 
