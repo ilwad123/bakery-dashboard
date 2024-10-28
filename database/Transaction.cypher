@@ -1,23 +1,21 @@
-LOAD CSV WITH HEADERS FROM
- "file:///sales_modified4.csv" as csv
-
+LOAD CSV WITH HEADERS FROM "file:///sales_modified4.csv" AS csv
 
 CREATE (t:Transaction {
-    Datetime: datetime(csv.datetime),
-    Day_of_week: csv.day of week,
+    Datetime: datetime(replace(csv.datetime, " ", "T")), 
+    Day_of_week: csv.`day of week`,
     Total: toFloat(csv.total),
     Place: csv.place,
-    Product_Names = split(csv.product_names, ','),//convert these strings into lists
-    Quantity_Per_Product = split(csv.quantities_product, ','),//convert these strings into lists
+    Product_Names: split(csv.product_names, ','),
+    Quantity_Per_Product: split(csv.quantities_product, ','),
     Order_status: csv.`Order status`,
-    Location: csv.location
+    Location: point({
+        latitude: toFloat(split(csv.location, ',')[0]),
+        longitude: toFloat(split(csv.location, ',')[1])
+    })
 })
-
 WITH t, split(csv.product_names, ',') AS productNames
-
-UNWIND productNames AS productName 
-MATCH (p:product {name: productNames})//connect the product node with the transaction productnames
-MERGE (t) - [:CONTAINS] -> (p) //estabilish the relationship 
+UNWIND productNames AS productName
+MATCH (p:Product {Name:productName})
+MERGE (t)-[:CONTAINS]->(p)
 
 RETURN "Transaction and product connection successful!"
-

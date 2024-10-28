@@ -40,6 +40,11 @@ for index, row in df.iterrows():
 
 df['location'] = location
 
+#removes brackets
+df['product_names'] = df['product_names'].str.strip('[]')
+#removes ''
+df['product_names'] = df['product_names'].replace({"'": "", '"': ""}, regex=True) 
+
 list1=df['location'].unique()
 print(len(list1))
 df.to_csv('sales_modified4.csv', index=False)

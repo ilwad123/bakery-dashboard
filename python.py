@@ -7,7 +7,6 @@ df = pd.read_csv(data)
 #replace the missing place name with the store location being dongmyeon
 df['place'].fillna('Dongmyeon', inplace=True)
 
-# Initialize the translator
 translator = GoogleTranslator(source='ko', target='en')
 
 unique_places = df['place'].unique()
@@ -36,7 +35,6 @@ for column in df.columns:
 # Drop rows with all missing values
 df.dropna(how='all', inplace=True)
 
-# Strip whitespace from column names
 df.columns = df.columns.str.strip()
 
 # Drop duplicate rows
@@ -50,7 +48,6 @@ df = df.dropna(subset=['total'])
 wrong_items = ['croque monsieur', 'mad garlic']
 df.drop(columns=wrong_items, inplace=True)
 
-#dongmyeon place of bakery
 wrong_translated_names = {
     'hibernation': 'Dongmyeon',  
     'Postscript 1': 'Hupyeong 1-dong',
@@ -58,9 +55,7 @@ wrong_translated_names = {
     'Pharmacist Myeongdong': 'Yagsamyeong-dong',
     'Postscript 3-dong':'Hupyeong 3-dong',
     'Jo Dong-un':'Jo-un-dong',
-    'Kyodong':'Gyo-dong,
-    
-'
+    'Kyodong':'Gyo-dong'
 }
 
 df['place'] = df['place'].replace(wrong_translated_names)

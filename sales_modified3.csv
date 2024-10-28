@@ -2416,6 +2416,6 @@ datetime,day of week,total,place,product_names,quantities_product,Order status
 2024-05-01 15:19:00,Fri,14500.0,Dongmyeon,"['plain bread', 'tiramisu croissant']","[1.0, 2.0]",Completed
 2024-05-02 11:37:00,Sat,19500.0,Dongmyeon,"['caffe latte', 'pain au chocolat', 'cheese cake', 'vanilla latte']","[1.0, 1.0, 1.0, 1.0]",Completed
 2024-05-02 11:39:00,Sat,19800.0,Hupyeong 1-dong,"['angbutter', 'americano', 'tiramisu croissant', 'berry ade']","[1.0, 1.0, 1.0, 1.0]",Completed
-2024-05-02 12:15:00,Sat,14300.0,Hyoja 2-dong,"['angbutter', 'plain bread', 'cacao deep']","[1.0, 1.0, 1.0]",Completed
-2024-05-02 13:45:00,Sat,15000.0,Soyang-dong,"['croissant', 'tiramisu croissant', 'cheese cake']","[1.0, 1.0, 1.0]",Completed
-2024-05-02 14:45:00,Sat,24100.0,Hyoja 1-dong,"['angbutter', 'tiramisu croissant', 'pain au chocolat', 'orange pound']","[2.0, 1.0, 1.0, 1.0]",Completed
+2024-05-02 12:15:00,Sat,14300.0,Hyoja 2-dong,"['angbutter', 'plain bread', 'cacao deep']","[1.0, 1.0, 1.0]",Pending
+2024-05-02 13:45:00,Sat,15000.0,Soyang-dong,"['croissant', 'tiramisu croissant', 'cheese cake']","[1.0, 1.0, 1.0]",Pending
+2024-05-02 14:45:00,Sat,24100.0,Hyoja 1-dong,"['angbutter', 'tiramisu croissant', 'pain au chocolat', 'orange pound']","[2.0, 1.0, 1.0, 1.0]",Pending

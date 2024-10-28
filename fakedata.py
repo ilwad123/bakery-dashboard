@@ -14,9 +14,8 @@ df['datetime'] = df['datetime'] +  pd.DateOffset(years=4)
 
 df['Order status'] = 'Completed'
 
-['Order status'] = 'Pending' last three should be pending
-#go back try 
-
+#last three orders left them as pending
+df.loc[df.index[-3:], 'Order status'] ='Pending'
 
 #when a new transaction is added make it as pending until changed 
 
