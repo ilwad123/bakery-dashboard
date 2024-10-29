@@ -11,11 +11,12 @@ CREATE (t:Transaction {
     Location: point({
         latitude: toFloat(split(csv.location, ',')[0]),
         longitude: toFloat(split(csv.location, ',')[1])
-    })
+    }),
+    Driver_id: toInteger(csv.Driver_id),
 })
-WITH t, split(csv.product_names, ',') AS productNames
-UNWIND productNames AS productName
-MATCH (p:Product {Name:productName})
+WITH t, split(csv.product_names, ',') AS productNames//
+UNWIND productNames AS productName //
+MATCH (p:Product {Name:productName})//match the
 MERGE (t)-[:CONTAINS]->(p)
 
 RETURN "Transaction and product connection successful!"

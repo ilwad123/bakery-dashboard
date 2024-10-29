@@ -2,6 +2,7 @@ import pandas as pd
 import random
 
 df = pd.read_csv('sales_modified3.csv')
+data=pd.read_csv("driver.csv")
 
 neighbourhood_coordinates = {
     "Dongmyeon": (37.8891, 127.8446),
@@ -44,6 +45,7 @@ df['location'] = location
 df['product_names'] = df['product_names'].str.strip('[]')
 #removes ''
 df['product_names'] = df['product_names'].replace({"'": "", '"': ""}, regex=True) 
+
 
 list1=df['location'].unique()
 print(len(list1))
