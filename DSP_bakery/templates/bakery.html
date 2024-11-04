@@ -1,10 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Chart.js Doughnut Chart Example</title>
-    <link href="main.css" rel="stylesheet">
+    <link href= "{% static 'css/main.css' %}" rel="stylesheet">
     <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
     <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -25,16 +26,16 @@
         <br>
         <br>
         <br>
-        <li><a href="#bakery.html"><i class="material-icons">dashboard</i> Dashboard
+        <li><a href="{% url 'home' %}"><i class="material-icons">dashboard</i> Dashboard
          </a></li>
         <li><a href="#Predictions"><i class="material-icons">insert_chart</i></i>Predictions
         </a></li>
         
        <li><a href="uploadcsv.html"><i class="material-icons">upload</i>Upload CSV</a></li>
 
-        <li><a href="reports.html"><i class="material-icons">report</i>Report</a></li>
+        <li><a href="{% url 'reports' %}"><i class="material-icons">report</i>Report</a></li>
 
-        <li><a href="login.html"><i class="material-icons">login</i>login</a></li>
+        <li><a href="{% url 'login' %}"><i class="material-icons">login</i>login</a></li>
 
       </ul>
     </div>
@@ -75,7 +76,9 @@
 
     <br>
     <br>
-    <script src="bakery.js"></script>
+    <script src="{% static 'js/bakery.js' %}"></script>
+    
+    
 </main>
 </body>
 </html>
