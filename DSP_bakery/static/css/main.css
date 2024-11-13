@@ -174,7 +174,7 @@ p{
         border-radius: 16px; 
         padding:15px;
         margin-top:30px;
-        margin-left:30px; 
+        margin-left:auto; 
         text-align: left;
         width: 20vh; 
         height:30%;
@@ -263,4 +263,48 @@ fieldset{
     display: flex;
     justify-content: center;
     align-items: center;  
+}
+
+
+.pagination {
+    text-align: left;
+    margin-top: 15px; /* Add spacing above pagination for better separation */
+}
+
+.pagination-links {
+    list-style: none; 
+    margin: 0;
+    padding: 0;
+    display: flex; /* Use flex layout for better alignment */
+    gap: 8px; /* Even space between items */
+}
+
+.pagination-links li {
+    display: inline-block;
+}
+
+.pagination-links a,
+.pagination-links .active {
+    text-decoration: none; 
+    padding: 8px 12px; /* Slightly larger padding for clickable area */
+    border: 1px solid var(--color-primary); 
+    border-radius: 7px;
+    color: white; 
+    background-color: var(--color-primary); 
+    font-weight: 300; 
+    font-size: 14px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.pagination-links a:hover {
+    background-color: #888; 
+    color: white;
+}
+
+.pagination-links .active {
+    background-color: #555; /* Active page color */
+    color: #fff;
+    border: 1px solid #555; /* Consistent border color */
+    font-weight: bold; /* Highlight active page */
 }

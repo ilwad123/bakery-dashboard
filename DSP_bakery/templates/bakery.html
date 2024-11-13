@@ -4,85 +4,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Chart.js Doughnut Chart Example</title>
-    <link href= "{% static 'css/main.css' %}" rel="stylesheet">
-    <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
-    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
+    <title>Bakery Dashboard</title>
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- chart.js extension -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <!-- to read through the csv  -->
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-doughnutlabel"></script> 
-    <!-- the label in the middle of the donut  -->
-</head>
-<style>
     
-</style>
+    <!-- FontAwesome from alternative CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Load Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
 <body>
     <div class="sidebar">
-    <ul>
-        <br>
-        <br>
-        <br>
-        <li><a href="{% url 'home' %}"><i class="material-icons">dashboard</i> Dashboard
-         </a></li>
-        <li><a href="#Predictions"><i class="material-icons">insert_chart</i></i>Predictions
-        </a></li>
-        
-       <li><a href="uploadcsv.html"><i class="material-icons">upload</i>Upload CSV</a></li>
-
-        <li><a href="{% url 'reports' %}"><i class="material-icons">report</i>Report</a></li>
-
-        <li><a href="{% url 'login' %}"><i class="material-icons">login</i>login</a></li>
-
-      </ul>
+        <ul>
+            <br><br><br>
+            <li><a href="{% url 'home' %}"><i class="material-icons">dashboard</i> Dashboard</a></li>
+            <li><a href="#Predictions"><i class="material-icons">insert_chart</i> Predictions</a></li>
+            <li><a href="uploadcsv.html"><i class="material-icons">upload</i>Upload CSV</a></li>
+            <li><a href="{% url 'reports' %}"><i class="material-icons">report</i>Report</a></li>
+            <li><a href="{% url 'login' %}"><i class="material-icons">login</i>Login</a></li>
+        </ul>
     </div>
+    <script>
+        const months = {{ months|safe }};
+        const sales = {{ sales|safe }};
+        const neighborhoods = {{ neighbourhood|safe }};
+        const neighborhoodSales = {{ total_neighborhood_sales|safe }};
+        
+    </script>
 <main>
     <div class="container">
-    <div class="card">
-        <div class="card-header">
-            <h3>Total Revenue</h3>
-            <button class="monthly">Monthly</button> 
+        <!-- Line Chart -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Total Revenue</h3>
+                <button class="monthly">Monthly</button> 
+            </div>
+            <p>₩<span id="currentSales"></span><span id="arrow"></span><span class="change" id="percent"></span><span class="percentage">%</span><span class="PM"> vs PM</span></p>
+            <canvas id="line" height="300"></canvas>
         </div>
-        <p>₩<span id="currentSales"></span><span id="arrow"></span><span class= "change" id="percent"></span><span class="percentage">%</span><span class="PM"> vs PM</span></p>
-        <canvas id="line" height="300"></canvas>
-    </div>
-    
-    <div class="card1">
-        <div class="card-header">
-            <h3>Total delivery sales per neighbourhood (₩)</h3>
+        
+        <!-- Bar Chart -->
+        <div class="card1">
+            <div class="card-header">
+                <h3>Total delivery sales per neighbourhood (₩)</h3>
+            </div>
+            <br><br>
+            <canvas id="bar" height="300"></canvas>
+        </div> 
+
+        <script>
+        
+        </script>    
+
+        <!-- Most Popular Products List -->
+        <div class="card2">
+            <div class="card-header">
+                <div class="popular-products">
+                    <h3>Most Selling Products</h3>
+                    <ol>
+                       {% for product, total_product in products_sales %}
+                        <li>{{ product }} - {{ total_product }}</li>
+                       {% endfor %}
+                    </ol>
+                </div>
+            </div>
+
+            {% if products_sales.has_other_pages %}
+            <div class="pagination">
+                <ul class="pagination-links">
+                    {% if products_sales.has_previous %}
+                        <li><a href="?page={{ products_sales.previous_page_number }}">Previous</a></li>
+                    {% endif %}
+        
+                    {% for num in products_sales.paginator.page_range %}
+                        {% if products_sales.number == num %}
+                            <li><strong>{{ num }}</strong></li>  {# Highlight the current page #}
+                        {% else %}
+                            <li><a href="?page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+        
+                    {% if products_sales.has_next %}
+                        <li><a href="?page={{ products_sales.next_page_number }}">Next</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            {% endif %}
         </div>
-        <br>
-        <br>
-        <!-- <h3>Total sales per place</h3> -->
-        <canvas id="bar" height="300"></canvas>
-    </div> 
-    <div class="card2">
-        <div class="card-header">
-        <h3>Popular products</h3>
-        </div>
-        <ol>
-        <ul id="salesList"></ul>
-        <ol>
-    </div>
-</div>
-    <div class="card3">
-        <!-- <h3>Total sales per product</h3> -->
-         <!-- Instead replace this for per category or just write most sales for drinks:....-->
-        <canvas id="donut"></canvas>
+        
     </div>
 
-    <br>
-    <br>
-    <script src="{% static 'js/bakery.js' %}"></script>
-    
-    
+    <div class="card3">
+        <canvas id="donut"></canvas>
+    </div>
+    <script src="{% static 'js/bar.js' %}"></script>
+    <script src="{% static 'js/line.js' %}"></script>
+
 </main>
 </body>
 </html>
-
-<!-- make a one for the best category-->
-<!--make one for the most popular product list-->
-<!--number of delivery neighboard locations-->

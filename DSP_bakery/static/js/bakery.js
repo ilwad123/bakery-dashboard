@@ -13,8 +13,8 @@
 //
 
 document.addEventListener('DOMContentLoaded', async function () {
-    const salesCSV = "/static/data_files/sales_modified.csv";
-    const pricesCSV = "/static/data_files/product_modified.csv";
+    const salesCSV = "static/data_files/sales_modified.csv";
+    const pricesCSV = "static/data_files/product_modified.csv";
 
     const fetchData = async () => {
         try {

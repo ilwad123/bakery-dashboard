@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "neo4j-driver": "^5.26.0"
+    "neo4j-driver": "^5.26.0",
+    "node": "^22.11.0"
   }
 }
