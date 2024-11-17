@@ -14,12 +14,15 @@ def home(request):
     months, sales = line_graph(request)
     neighbourhood,total_neighborhood_sales=bar_graph(request)
     products_sales=most_popular(request)
+    categories,quantities=popular_category(request)
     context ={
         'months': months,
         'sales': sales,
         'neighbourhood':neighbourhood,
         'total_neighborhood_sales': total_neighborhood_sales,  
         'products_sales':products_sales,
+        'Category':categories,
+        'Total_quantity':quantities
     }
   
     return render(request, 'bakery.html', context)
@@ -105,16 +108,27 @@ def most_popular(request):
     
     return paginated_products
 
-# def category(request):
-#     with driver.session() as session:
-#         category1=session.run("""
-#                 MATCH (t:Transaction)
-#                 UNWIND t.Product_Names AS Product
-#                 UNWIND t.Quantity_Per_Product AS Quantity 
-#                 WITH TRIM(Product) AS New_product, TOFLOAT(TRIM(Quantity)) AS New_quantity
-#                 WHERE New_quantity IS NOT NULL  // Filter out NULL quantities
-#                 RETURN New_product, SUM(New_quantity) AS Total_product
-#                 ORDER BY Total_product DESC
-#             """)
-        
-       
+def popular_category(request):
+    with driver.session() as session:
+            category1=session.run("""
+                MATCH (t:Transaction)
+                UNWIND t.Product_Names AS Product
+                UNWIND t.Quantity_Per_Product AS Quantity
+                WITH TRIM(Product) AS New_product, 
+                TOFLOAT(TRIM(REPLACE(REPLACE(Quantity, "[", ""), "]", ""))) AS New_quantity
+                WHERE New_quantity IS NOT NULL  // Filter out invalid or NULL quantities
+                MATCH (p:Product {Name: New_product})-[:BELONGS_TO]->(c:Category)
+                WITH c.Category AS Category, SUM(New_quantity) AS Total_quantity
+                RETURN Category, Total_quantity
+                ORDER BY Total_quantity DESC
+
+            """)
+            
+            categories = []
+            quantities= []
+            for record in category1:
+                print(record)
+                categories.append(record['Category'])
+                quantities.append(record["Total_quantity"])
+
+    return categories,quantities

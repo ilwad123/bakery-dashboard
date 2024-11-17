@@ -26,11 +26,79 @@
             <li><a href="{% url 'login' %}"><i class="material-icons">login</i>Login</a></li>
         </ul>
     </div>
+    <style>
+        .pagination {
+            text-align: left;
+            
+            display: flex;
+            justify-content: center; /* Center pagination inside the card */
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+            margin: 0;
+            padding: 0; 
+        }
+        
+        .pagination-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .pagination-links li {
+            display: inline-block;
+            margin-right: 5px; 
+        }
+        
+        .pagination-links a,
+        .pagination-links li strong {
+            display: inline-block;
+            text-decoration: none;
+            padding: 5px 10px;
+            border: 1px solid #6C244C;
+            border-radius: 7px;
+            font-size: 18px;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            transition: 0.3s ease-in-out;
+        }
+        
+        .pagination-links a {
+            color: white;
+            background-color: #6C244C;
+            font-weight: 300;
+        }
+        
+        .pagination-links a:hover {
+            background-color: #888;
+            color: white;
+        }
+        
+        .pagination-links li strong {
+            color: #6C244C;
+            background-color: white;
+            font-weight: bold;
+            cursor: default;
+            margin-right: 5px; 
+        }
+        
+        .pagination-links li strong:hover {
+            background-color: white;
+            color: #6C244C;
+            border-color: #6C244C;
+        }
+        .card2 ol li {
+            font-size: 17px; 
+            font-weight: 500;
+            margin-bottom: 10px; 
+        }
+        
+    </style>
     <script>
         const months = {{ months|safe }};
         const sales = {{ sales|safe }};
         const neighborhoods = {{ neighbourhood|safe }};
         const neighborhoodSales = {{ total_neighborhood_sales|safe }};
+        {% comment %} const categories={{categories|safe }};
+        const quantities={{quantities|safe }};  {% endcomment %}
+        
         
     </script>
 <main>
@@ -42,16 +110,16 @@
                 <button class="monthly">Monthly</button> 
             </div>
             <p>₩<span id="currentSales"></span><span id="arrow"></span><span class="change" id="percent"></span><span class="percentage">%</span><span class="PM"> vs PM</span></p>
-            <canvas id="line" height="300"></canvas>
+            <canvas id="line" height="300" width="310"></canvas>
         </div>
         
         <!-- Bar Chart -->
         <div class="card1">
             <div class="card-header">
-                <h3>Total delivery sales per neighbourhood (₩)</h3>
+             <h3>Total delivery sales per neighbourhood (₩)</h3>
             </div>
-            <br><br>
-            <canvas id="bar" height="300"></canvas>
+            <br>
+            <canvas id="bar" height="275"></canvas>
         </div> 
 
         <script>
@@ -59,48 +127,50 @@
         </script>    
 
         <!-- Most Popular Products List -->
+         <br>
+         <br>
         <div class="card2">
-            <div class="card-header">
                 <div class="popular-products">
-                    <h3>Most Selling Products</h3>
-                    <ol>
+                    <h2>Most Selling Products</h2>
+                    <ol start="{{ products_sales.start_index }}">
                        {% for product, total_product in products_sales %}
                         <li>{{ product }} - {{ total_product }}</li>
                        {% endfor %}
                     </ol>
-                </div>
+            
 
             {% if products_sales.has_other_pages %}
             <div class="pagination">
                 <ul class="pagination-links">
                     {% if products_sales.has_previous %}
-                        <li><a href="?page={{ products_sales.previous_page_number }}">Previous</a></li>
+                        <li><a href="?page={{ products_sales.previous_page_number }}">⇐</a></li>
                     {% endif %}
         
                     {% for num in products_sales.paginator.page_range %}
                         {% if products_sales.number == num %}
-                            <li><strong>{{ num }}</strong></li>  {# Highlight the current page #}
+                            <li><strong>{{ num }}</strong></li> 
                         {% else %}
                             <li><a href="?page={{ num }}">{{ num }}</a></li>
                         {% endif %}
                     {% endfor %}
         
                     {% if products_sales.has_next %}
-                        <li><a href="?page={{ products_sales.next_page_number }}">Next</a></li>
+                        <li><a href="?page={{ products_sales.next_page_number }}">⇒</a></li>
                     {% endif %}
                 </ul>
             </div>
             {% endif %}
         </div>
     </div>
-    </div>
-
+</div>
+<br>
+<br>
     <div class="card3">
         <canvas id="donut"></canvas>
     </div>
     <script src="{% static 'js/bar.js' %}"></script>
     <script src="{% static 'js/line.js' %}"></script>
-
+    {% comment %} <script src="{% static 'js/donut.js' %}"></script>  {% endcomment %}
 </main>
 </body>
 </html>
