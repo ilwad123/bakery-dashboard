@@ -57,6 +57,9 @@ for index, row in df.iterrows():
         df.at[index, 'Category'] = 'Desserts'
     elif product_name in other_foods_list:
         df.at[index, 'Category'] = 'Other Foods'
+        
+for index,row in df.iterrows():
+    df['price'] = df['price'].astype(float) / 1000
 
 df.columns = df.columns.str.strip()
 df.to_csv('product_modified2.csv', index=False)

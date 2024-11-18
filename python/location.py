@@ -23,7 +23,7 @@ neighbourhood_coordinates = {
     "Dongnae-myeon": (37.84176039671483, 127.78319181349737),
     "Sindong-myeon": (37.81356268642998, 127.70622987784363),
 }
-
+#REPLACE THIS WITH BRISTOL LOCATIONS 
 location = []
 
 for index, row in df.iterrows():
