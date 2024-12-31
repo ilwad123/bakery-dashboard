@@ -1,11 +1,12 @@
 LOAD CSV WITH HEADERS FROM "file:///neighbourhood.csv" AS csv
 
-Create (n:Neighbourhood{
-
-Name:csv.Name
-driver_location: point({
-        latitude: toFloat(split(csv., ',')[0]),
-        longitude: toFloat(split(csv.driver_location, ',')[1])
+CREATE (n:Neighbourhood {
+    Name: csv.Neighborhood,
+    driver_location: point({
+        latitude: toFloat(split(csv.Coordinates, ',')[0]), 
+        longitude: toFloat(split(csv.Coordinates, ',')[1]) 
     })
 })
-Merge (n)-[:DELIVERED_TO]->(t)
+
+
+MERGE (n)-[:DELIVERED_TO]->(t)

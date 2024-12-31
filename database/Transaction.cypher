@@ -14,9 +14,9 @@ CREATE (t:Transaction {
     }),
     Driver_id: toInteger(csv.Driver_id),
 })
-WITH t, split(csv.product_names, ',') AS productNames//
-UNWIND productNames AS productName //
-MATCH (p:Product {Name:productName})//match the
+WITH t, split(csv.product_names, ',') AS productNames
+UNWIND productNames AS productName 
+MATCH (p:Product {Name:productName})
 MERGE (t)-[:CONTAINS]->(p)
 
 RETURN "Transaction and product connection successful!"
