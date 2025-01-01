@@ -90,16 +90,17 @@
             margin-bottom: 10px; 
         }
         
+        
     </style>
     <script>
-        const months = {{ months|safe }};
-        const sales = {{ sales|safe }};
-        const neighborhoods = {{ neighbourhood|safe }};
-        const neighborhoodSales = {{ total_neighborhood_sales|safe }};
-        {% comment %} const categories={{categories|safe }};
-        const quantities={{quantities|safe }};  {% endcomment %}
-        
-        
+        const months = JSON.parse('{{ months|safe|escapejs }}');
+        const sales = JSON.parse('{{ sales|safe|escapejs }}');
+        const neighborhoods = JSON.parse('{{ neighbourhood|safe|escapejs }}');
+        const neighborhoodSales = JSON.parse('{{ total_neighborhood_sales|safe|escapejs }}');
+        const categories = JSON.parse('{{ categories|safe|escapejs }}');
+        const quantities = JSON.parse('{{ quantities|safe|escapejs }}');
+        console.log('Categories:', categories);
+        console.log('Quantities:', quantities);
     </script>
 <main>
     <div class="container">
@@ -109,7 +110,11 @@
                 <h3>Total Revenue</h3>
                 <button class="monthly">Monthly</button> 
             </div>
-            <p>£<span id="currentSales"></span><span id="arrow"></span><span class="change" id="percent"></span><span class="percentage">%</span><span class="PM"> vs PM</span></p>
+            <p>£<span id="currentSales"></span>
+                <span id="arrow"></span>
+                <span class="change" id="percent"></span>
+                <span class="percentage">%</span>
+                <span class="PM"> vs PM</span></p>
             <canvas id="line" height="250"></canvas>
         </div>
         
@@ -167,11 +172,50 @@
 <br>
 <br>
     <div class="card3">
-        <canvas id="donut"></canvas>
+        <canvas id="donut" ></canvas>
     </div>
-    <script src="{% static 'js/bar.js' %}"></script>
-    <script src="{% static 'js/line.js' %}"></script>
     {% comment %} <script src="{% static 'js/donut.js' %}"></script>  {% endcomment %}
+    <script src="{% static 'js/line.js' %}"></script>
+    <script src="{% static 'js/bar.js' %}"></script>
 </main>
 </body>
+<script>
+const myUniqueDonutCTX = document.getElementById('donut').getContext('2d');
+
+const donutChart = new Chart(myUniqueDonutCTX, {
+    type: 'doughnut',
+    data: {
+        labels: categories,
+        datasets: [{
+            data: quantities,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.4)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+            },
+            title: {
+                display: true,
+                text: 'Total Sales per Product'
+            }
+        }
+    }
+});
+
+</script>
 </html>

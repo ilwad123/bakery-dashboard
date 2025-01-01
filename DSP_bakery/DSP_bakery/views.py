@@ -15,14 +15,14 @@ def home(request):
     neighbourhood,total_neighborhood_sales=bar_graph(request)
     products_sales=most_popular(request)
     categories,quantities=popular_category(request)
-    context ={
-        'months': months,
-        'sales': sales,
-        'neighbourhood':neighbourhood,
-        'total_neighborhood_sales': total_neighborhood_sales,  
-        'products_sales':products_sales,
-        'Category':categories,
-        'Total_quantity':quantities
+    context = {
+        'months': json.dumps(months),
+        'sales': json.dumps(sales),
+        'products_sales': products_sales,
+        'neighbourhood': json.dumps(neighbourhood),
+        'total_neighborhood_sales': json.dumps(total_neighborhood_sales),
+        'categories': json.dumps(categories),
+        'quantities': json.dumps(quantities),
     }
   
     return render(request, 'bakery.html', context)
@@ -58,7 +58,7 @@ def line_graph(request):
             print(record)
             dt = record["month"]
             months.append(dt.strftime("%b %Y"))
-            sales.append(record["monthly_sales"])
+            sales.append(round(record["monthly_sales"], 2))
 
         print("Months:", months)
         print("Sales:", sales)
