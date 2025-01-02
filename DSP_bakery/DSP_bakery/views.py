@@ -2,10 +2,13 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.shortcuts import render
 from neo4j import GraphDatabase
+import os
+from django.conf import settings
 from django.core.paginator import Paginator
 from django.conf import settings
 from datetime import datetime
 import json
+import pandas as pd
 
 
 driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USERNAME, settings.NEO4J_PASSWORD))
@@ -15,6 +18,8 @@ def home(request):
     neighbourhood,total_neighborhood_sales=bar_graph(request)
     products_sales=most_popular(request)
     categories,quantities=popular_category(request)
+    datetime1, total_sales = heatmap(request)
+    
     context = {
         'months': json.dumps(months),
         'sales': json.dumps(sales),
@@ -23,9 +28,32 @@ def home(request):
         'total_neighborhood_sales': json.dumps(total_neighborhood_sales),
         'categories': json.dumps(categories),
         'quantities': json.dumps(quantities),
+        'datetime': datetime1,
+        'total_sales': total_sales,
+        
     }
-  
+    print("context")
     return render(request, 'bakery.html', context)
+
+
+def create_datetime_dataframe(datetime1, total_sales):
+    # Check if lists are non-empty
+    if not datetime1 or not total_sales:
+        print("Data lists are empty. DataFrame not created.")
+        return None
+
+    # Create a DataFrame from datetime1 and total_sales
+    datetime_df = pd.DataFrame({'Datetime': datetime1, 'Total Sales': total_sales})
+
+    # Ensure that the file path is within your project directory (e.g., in MEDIA_ROOT)
+    file_path = os.path.join('datetime.csv')
+    
+    # Save the DataFrame to a CSV file with a proper file path
+    datetime_df.to_csv(file_path, index=False)
+    print(f"DataFrame saved to: {file_path}")
+
+    return datetime_df
+
 
 def login(request):
     return render(request,'login.html')
@@ -132,3 +160,22 @@ def popular_category(request):
                 quantities.append(record["Total_quantity"])
 
     return categories,quantities
+
+#heatmap should have total volume sales day and hour wise
+def heatmap(request):  
+    with driver.session() as session:
+        heatmap = session.run("""
+            MATCH (t:Transaction)
+            WITH t.Datetime AS datetime, SUM(t.Total) AS total_sales
+            RETURN datetime, total_sales
+            ORDER BY datetime
+        """)
+
+        datetime1 = []
+        total_sales = []
+        for record in heatmap:
+            print(record)
+            datetime1.append(record['datetime'])
+            total_sales.append(record["total_sales"])
+        
+    return datetime1, total_sales

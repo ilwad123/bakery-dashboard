@@ -160,6 +160,7 @@ p{
     width: 350px;
     height: 50vh;
     font-family: 'Poppins', sans-serif;
+    margin-top:30px;
 }
 
 /* add a gap between card3 and card4 */
@@ -175,13 +176,38 @@ p{
     margin: 15px;
     text-align: center;
     width: 108vh;
-    margin-top: 3px;
+    margin-top:30px;
     /* margin-bottom: 20px; use this for the last card to give space for the bottom of the page */
     height:58vh;
     float:inline-start;
 }
 
+.summary,.summary2,.summary3,.summary4{
+    box-shadow: 0 6px 12px rgba(108, 36, 76, 0.8);
+    background-color: white;
+    border-radius: 16px;
+    padding: 15px;
+    margin-top: 10px;
+    margin-left: 70px;
+    text-align: left;
+    width: 19%; 
+    min-width: 100px;
+    height: 15vh;
+    font-family: 'Poppins', sans-serif;
+    float:inline-start;
+}
+.summary2{
+    margin-left: 25px;
+}
+.summary3{
+    margin-left: 25px;
+}
+.summary4{
+    margin-left: 25px;
+}
+
 .container {
+    float:inline-start;
     display: flex;
     justify-content: space-between;
 }
