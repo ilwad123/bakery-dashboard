@@ -16,12 +16,29 @@
 </head>
 
 <body>
+        <!-- Topbar with Hamburger Menu -->
+        <header class="topbar">
+            <button class="hamburger" onclick="toggleMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </header>
+    
+        <!-- Mobile Menu -->
+        <nav class="mobile-menu">
+            <ul>
+                <li><a href="{% url 'home' %}"><i class="material-icons">dashboard</i> Dashboard</a></li>
+                <li><a href="#Predictions"><i class="material-icons">insert_chart</i> Predictions</a></li>
+                <li><a href="uploadcsv.html"><i class="material-icons">table_chart</i>Sales History</a></li>
+                <li><a href="{% url 'reports' %}"><i class="material-icons">report</i> Report</a></li>
+                <li><a href="{% url 'login' %}"><i class="material-icons">login</i> Login</a></li>
+            </ul>
+        </nav> 
     <div class="sidebar">
         <ul>
             <br><br><br>
             <li><a href="{% url 'home' %}"><i class="material-icons">dashboard</i> Dashboard</a></li>
             <li><a href="#Predictions"><i class="material-icons">insert_chart</i> Predictions</a></li>
-            <li><a href="uploadcsv.html"><i class="material-icons">upload</i>Upload CSV</a></li>
+            <li><a href="uploadcsv.html"><i class="material-icons">table_chart</i>Sales History</a></li>
             <li><a href="{% url 'reports' %}"><i class="material-icons">report</i>Report</a></li>
             <li><a href="{% url 'login' %}"><i class="material-icons">login</i>Login</a></li>
         </ul>
@@ -223,4 +240,10 @@ const donutChart = new Chart(myUniqueDonutCTX, {
 });
 
 </script>
+<script>
+    function toggleMenu() {
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.toggle('active');
+    }
+<script>
 </html>
