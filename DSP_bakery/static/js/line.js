@@ -2,7 +2,7 @@ const currentSales = sales[sales.length - 1];
 const previousSales = sales[sales.length - 2];
 const percent = ((currentSales - previousSales) / previousSales * 100).toFixed(2);
 
-document.getElementById('currentSales').textContent ;
+document.getElementById('currentSales').textContent = currentSales;
 
     if (currentSales > previousSales) {
         const arrowup = document.getElementById("arrow");
