@@ -122,10 +122,10 @@
 <main>
     <div class="summary" style="background: linear-gradient(to right, #FF8AAE, #FF5C5C);">
         <h2>Net Sales</h2>
-        <p>£<span id="currentSales1"></span>
-            <span id="arrow1"></span>
+        <p>£<span id="currentSales1"></span><span id="arrow1"></span>
+            {% comment %} <span class="percent1"></span> {% endcomment %}
         </p>
-
+        <!-- calculate difference from last week  -->
         <svg class="line-graph" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
             <!-- Glow effect using polygon -->
             <defs>
@@ -143,20 +143,23 @@
 <!-- Pinky red colour  -->   
     <div class="summary2" style= "background: linear-gradient(to right, #A88BEB, #867AE9);">
         <h4>Number of Delivery Drivers</h4>
-        <p> () </p>
+        <p>{{num_of_drivers}}</span></p>
         <!-- Purple colour  -->
 
     </div>
     <div class="summary3" style="background: linear-gradient(to right, #8EC5FC,rgb(96, 131, 245));">
         <h4> Number of delivery transactions </h4>
-        <p> () </p>
+        <p> {{num_of_transactions}} </p>
         <!-- Blue colour  -->
 
     </div>
     <div class="summary4" style="background: linear-gradient(to right, #F2994A, #F2C94C);">
         <h4>Most Popular product</h4>
         <!-- yellow colour  -->
-        <p> () </p>
+         {% comment %} access the first element of the list and first key {% endcomment %}
+        <p >{{ products_sales.object_list.0.0 }} </p>
+        {% comment %} If i want to get the quantity use this  {% endcomment %}
+        {% comment %} {{ products_sales.object_list.0.1 }} {% endcomment %} 
     </div> 
     <div class="container">
         <!-- Line Chart -->
@@ -168,11 +171,9 @@
                 <h3>Total Revenue</h3>
                 <button class="monthly">Monthly</button> 
             </div>
-            <p>£<span id="currentSales"></span>
-                <span id="arrow"></span>
-                <span class="change" id="percent"></span>
-                <span class="percentage">%</span>
-                <span class="PM"> vs PM</span></p>
+            <p>£<span id="currentSales"></span><span id="arrow"></span><span class="change" id="percent"></span>
+                <span class="percentage"></span>
+                <span class="PM">vs PM</span></p>
             <canvas id="line" height="250"></canvas>
         </div>
         
@@ -239,10 +240,10 @@
          <canvas id="heatmap"></canvas>
          </div>
         </div>
-    {% comment %} <script src="{% static 'js/donut.js' %}"></script>  {% endcomment %}
     <script src="{% static 'js/line.js' %}"></script>
     <script src="{% static 'js/bar.js' %}"></script>
     <script src="{% static 'js/linesummary.js' %}"></script>
+
 </main>
 </body>
 <script>
@@ -290,4 +291,5 @@ const donutChart = new Chart(myUniqueDonutCTX, {
         sidebar.classList.toggle('active');
     }
 <script>
+
 </html>

@@ -19,6 +19,8 @@ def home(request):
     products_sales=most_popular(request)
     categories,quantities=popular_category(request)
     datetime1, total_sales = heatmap(request)
+    num_of_drivers1 = num_of_drivers(request)
+    num_of_transactions1 = num_of_transactions(request)
     
     context = {
         'months': json.dumps(months),
@@ -30,6 +32,8 @@ def home(request):
         'quantities': json.dumps(quantities),
         'datetime': datetime1,
         'total_sales': total_sales,
+        'num_of_drivers': json.dumps(num_of_drivers1),
+        'num_of_transactions': json.dumps(num_of_transactions1)
         
     }
     print("context")
@@ -179,3 +183,25 @@ def heatmap(request):
             total_sales.append(record["total_sales"])
         
     return datetime1, total_sales
+
+def num_of_drivers(request):
+    with driver.session() as session:
+        num_of_drivers1 = session.run("""
+            MATCH (d:Driver)
+            RETURN COUNT(d) AS num_of_drivers
+        """)
+        for record in num_of_drivers1:
+            print(record)
+            num_of_drivers1 = record["num_of_drivers"]
+    return num_of_drivers1
+
+def num_of_transactions(request):
+    with driver.session() as session:
+        num_of_transactions1 = session.run("""
+            MATCH (t:Transaction)
+            RETURN COUNT(t) AS num_of_transactions
+        """)
+        for record in num_of_transactions1:
+            print(record)
+            num_of_transactions1 = record["num_of_transactions"]
+    return num_of_transactions1

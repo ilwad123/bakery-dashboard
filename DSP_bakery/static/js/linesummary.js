@@ -1,12 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
     const currentSales1 = sales[sales.length - 1];
-    const previousSales1 = sales[sales.length - 2]; 
+    const previousSales1 = sales[sales.length - 2];
+
+    // const percentchange= ((currentSales1 - previousSales1) / previousSales1 * 100).toFixed(2);
+    // const percentElement = document.getElementById('percent1');
+    // percentElement.textContent = percentchange + "% from last week";
     
     const currentSalesElement = document.getElementById('currentSales1');
     currentSalesElement.textContent = currentSales1.toFixed(2); 
     const graphLine = document.getElementById('graphLine');
     const graphGlow = document.getElementById('graphGlow');
 
+    
   
     if (currentSales1 > previousSales1) {
         // Line graph goes up

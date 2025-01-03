@@ -1,7 +1,9 @@
 const currentSales = sales[sales.length - 1];
 const previousSales = sales[sales.length - 2];
 const percent = ((currentSales - previousSales) / previousSales * 100).toFixed(2);
-document.getElementById('currentSales')= currentSales.toFixed(2);
+
+const currentSalesElement1 = document.getElementById('currentSales');
+currentSalesElement1.textContent = currentSales.toFixed(2); 
 
     if (currentSales > previousSales) {
         const arrowup = document.getElementById("arrow");
@@ -12,7 +14,8 @@ document.getElementById('currentSales')= currentSales.toFixed(2);
         const arrowdown = document.getElementById("arrow");
         arrowdown.innerText = "🔻";
         arrowdown.style.color = "red";
-        document.getElementById("percent").textContent = percent;
+        arrowdown.style.fontSize = "0.9em";
+        document.getElementById("percent").textContent = percent + "%";
     }
 
 const lineCtx = document.getElementById('line').getContext('2d');

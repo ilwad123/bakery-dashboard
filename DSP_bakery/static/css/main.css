@@ -226,10 +226,12 @@ box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.1);
     font-family: 'Montserrat', sans-serif;
 }
 .summary2 p {
-    font-size: 1.5em;
+    font-size: 2em;
     font-weight: 700;
     margin: 10px 0;
-  }
+    text-align: center;
+    color: white;
+}
 .summary3{
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.1); 
 }
@@ -254,9 +256,11 @@ box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.1);
     font-family: 'Montserrat', sans-serif;
 }
 .summary4 p {
-    font-size: 1.5em;
+    font-size: 1.2em;
     font-weight: 700;
     margin: 10px 0;
+    color: white;
+    font-family: 'Poppins', sans-serif;
   }
 
 .summary2{
@@ -288,7 +292,6 @@ box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.1);
     height: auto;        /* Maintains aspect ratio */
     opacity: 0.5;        /* Subtle white effect */
 }
-
 .line-graph polyline {
     stroke: rgba(255, 255, 255, 0.7); /* Transparent white stroke */
     stroke-width: 2;                 /* Thickness of the line */
@@ -328,13 +331,14 @@ box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 .PM{
     color:black; 
-    font-size: 1rem;
+    font-size: 1.1rem;
     margin-left: 0;
     font-family: 'Courier New', Courier, monospace;
 }
-.arrow{
-    font-size: 50px;
-}
+
+/* .arrow{
+    font-size: 10px;
+} */
 
 .area
 {
