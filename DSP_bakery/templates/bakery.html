@@ -121,10 +121,26 @@
     </script>
 <main>
     <div class="summary" style="background: linear-gradient(to right, #FF8AAE, #FF5C5C);">
-        <h2>Net sales</h2>
-        <p>£ () </p>
-        <!-- Pinky red colour  -->
-</div>        
+        <h2>Net Sales</h2>
+        <p>£<span id="currentSales1"></span>
+            <span id="arrow1"></span>
+        </p>
+
+        <svg class="line-graph" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+            <!-- Glow effect using polygon -->
+            <defs>
+                <filter id="blur" x="0" y="0" width="200%" height="200%">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="5" />
+                </filter>
+            </defs>
+            <!-- Blurred filled area (this is static, and will adjust dynamically with JavaScript) -->
+            <polygon id="graphGlow" points="0,40 20,30 40,20 60,25 80,10 100,15 100,50 0,50" fill="rgba(255, 255, 255, 0.3)" filter="url(#blur)" />
+            <!-- Line graph (dynamic points will be updated by JavaScript) -->
+            <polyline id="graphLine" fill="none" stroke="#fff" stroke-width="2" points="0,40 20,30 40,20 60,25 80,10 100,15" />
+        </svg>
+    </div>    
+<!-- Add percentage change from last week -->
+<!-- Pinky red colour  -->   
     <div class="summary2" style= "background: linear-gradient(to right, #A88BEB, #867AE9);">
         <h4>Number of Delivery Drivers</h4>
         <p> () </p>
@@ -132,18 +148,21 @@
 
     </div>
     <div class="summary3" style="background: linear-gradient(to right, #8EC5FC,rgb(96, 131, 245));">
-        <h4> Total Delivery Sales </h4>
+        <h4> Number of delivery transactions </h4>
         <p> () </p>
         <!-- Blue colour  -->
 
     </div>
     <div class="summary4" style="background: linear-gradient(to right, #F2994A, #F2C94C);">
-        <h4>Growth</h4>
+        <h4>Most Popular product</h4>
         <!-- yellow colour  -->
         <p> () </p>
     </div> 
     <div class="container">
         <!-- Line Chart -->
+                <!-- Add weekly Chart when u press the button -->
+                <!-- Add Annually Chart when u press the button -->
+
         <div class="card">
             <div class="card-header">
                 <h3>Total Revenue</h3>
@@ -223,6 +242,7 @@
     {% comment %} <script src="{% static 'js/donut.js' %}"></script>  {% endcomment %}
     <script src="{% static 'js/line.js' %}"></script>
     <script src="{% static 'js/bar.js' %}"></script>
+    <script src="{% static 'js/linesummary.js' %}"></script>
 </main>
 </body>
 <script>
