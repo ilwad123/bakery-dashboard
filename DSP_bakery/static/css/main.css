@@ -183,7 +183,6 @@ p{
 }
 
 .summary,.summary2,.summary3,.summary4{
-    box-shadow: 0 6px 12px rgba(108, 36, 76, 0.8);
     background-color: white;
     border-radius: 16px;
     padding: 10px;
@@ -196,6 +195,65 @@ p{
     font-family: 'Poppins', sans-serif;
     float:inline-start;
 }
+.summary{
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
+   
+}
+.summary h2{
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 300;
+    font-family: 'Montserrat', sans-serif;
+}
+.summary p {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin: 10px 0;
+  }
+  
+.summary2{
+box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.1); 
+}
+.summary2 h4{
+    color: white;
+    font-size: 1rem;
+    font-weight: 300;
+    font-family: 'Montserrat', sans-serif;
+}
+.summary2 p {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin: 10px 0;
+  }
+.summary3{
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.1); 
+}
+.summary3 h4{
+    color: white;
+    font-size: 1rem;
+    font-weight: 300;
+    font-family: 'Montserrat', sans-serif;
+}
+.summary3 p {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin: 10px 0;
+  }
+.summary4{
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.summary4 h4{
+    color: white;
+    font-size: 1rem;
+    font-weight: 300;
+    font-family: 'Montserrat', sans-serif;
+}
+.summary4 p {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin: 10px 0;
+  }
+
 .summary2{
     margin-left: 25px;
 }
