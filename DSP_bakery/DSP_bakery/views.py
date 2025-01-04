@@ -20,7 +20,9 @@ def home(request):
     categories,quantities=popular_category(request)
     datetime1, total_sales = heatmap(request)
     num_of_drivers1 = num_of_drivers(request)
-    num_of_transactions1 = num_of_transactions(request)
+    num_of_transactions = num_of_transactions1(request)
+    months2,num_of_transactions_monthly=num_of_transactions_monthly1(request)
+    popular_product = most_popular1(request)  # Get the most popular product
     
     context = {
         'months': json.dumps(months),
@@ -33,8 +35,10 @@ def home(request):
         'datetime': datetime1,
         'total_sales': total_sales,
         'num_of_drivers': json.dumps(num_of_drivers1),
-        'num_of_transactions': json.dumps(num_of_transactions1)
-        
+        'num_of_transactions': json.dumps(num_of_transactions),
+        'num_of_transactions_monthly': json.dumps(num_of_transactions_monthly),
+        'months2': json.dumps(months2),
+        'popular_product': popular_product,
     }
     print("context")
     return render(request, 'bakery.html', context)
@@ -72,7 +76,6 @@ def my_view(request):
         # Run a simple query to fetch nodes
         result = session.run("MATCH (n) RETURN n LIMIT 10")
         node = result.value()
-        print(node)
 
 def line_graph(request):
     print("Line graph view triggered") 
@@ -87,13 +90,12 @@ def line_graph(request):
         months = []
         sales = []
         for record in monthly_sales:
-            print(record)
             dt = record["month"]
             months.append(dt.strftime("%b %Y"))
             sales.append(round(record["monthly_sales"], 2))
 
-        print("Months:", months)
-        print("Sales:", sales)
+        # print("Months:", months)
+        # print("Sales:", sales)
     
     return months, sales
 
@@ -110,38 +112,16 @@ def bar_graph(request):
         neighbourhood = []
         total_neighborhood_sales= []
         for record in neighbourhoodsales:
-            print(record)
             neighbourhood.append(record['Place'])
             total_neighborhood_sales.append(record["total_neighborhood_sales"])
-            
-        
-        print("Neighbourhood:",neighbourhood)
 
     return neighbourhood, total_neighborhood_sales
 
-def most_popular(request):
-    with driver.session() as session:
-        most_popular = session.run("""
-                MATCH (t:Transaction)
-                UNWIND t.Product_Names AS Product
-                UNWIND t.Quantity_Per_Product AS Quantity 
-                WITH TRIM(Product) AS New_product, TOFLOAT(TRIM(Quantity)) AS New_quantity
-                WHERE New_quantity IS NOT NULL  // Filter out NULL quantities
-                RETURN New_product, SUM(New_quantity) AS Total_product
-                ORDER BY Total_product DESC
-            """)
-        
-        products_sales = [(record['New_product'], record["Total_product"]) for record in most_popular]
-        
-        per_page = 5  
-        page_number = request.GET.get('page', 1)  
-        paginator = Paginator(products_sales, per_page)  
-        paginated_products = paginator.get_page(page_number)  
-    
-    return paginated_products
+
 
 def popular_category(request):
     with driver.session() as session:
+            print("popular category triggered/donut chart")
             category1=session.run("""
                 MATCH (t:Transaction)
                 UNWIND t.Product_Names AS Product
@@ -159,7 +139,6 @@ def popular_category(request):
             categories = []
             quantities= []
             for record in category1:
-                print(record)
                 categories.append(record['Category'])
                 quantities.append(record["Total_quantity"])
 
@@ -178,7 +157,6 @@ def heatmap(request):
         datetime1 = []
         total_sales = []
         for record in heatmap:
-            print(record)
             datetime1.append(record['datetime'])
             total_sales.append(record["total_sales"])
         
@@ -191,17 +169,72 @@ def num_of_drivers(request):
             RETURN COUNT(d) AS num_of_drivers
         """)
         for record in num_of_drivers1:
-            print(record)
             num_of_drivers1 = record["num_of_drivers"]
     return num_of_drivers1
 
-def num_of_transactions(request):
+def num_of_transactions1(request):
     with driver.session() as session:
-        num_of_transactions1 = session.run("""
+        result = session.run("""
             MATCH (t:Transaction)
             RETURN COUNT(t) AS num_of_transactions
         """)
-        for record in num_of_transactions1:
-            print(record)
-            num_of_transactions1 = record["num_of_transactions"]
-    return num_of_transactions1
+        for record in result:
+            num_of_transactions = record["num_of_transactions"]
+    return num_of_transactions
+
+def num_of_transactions_monthly1(request):
+    with driver.session() as session:
+        print("transaction")
+        result = session.run("""
+            MATCH (t:Transaction)
+            WITH datetime({ year: t.Datetime.year, month: t.Datetime.month, day: 1 }) AS month, COUNT(t) AS num_of_transactions
+            RETURN month, num_of_transactions
+            ORDER BY month
+        """)
+        months2 = []
+        num_of_transactions_monthly = []
+        for record in result:
+            dt = record["month"]
+            months2.append(dt.strftime("%b %Y"))
+            num_of_transactions_monthly.append(record["num_of_transactions"]) 
+    return months2, num_of_transactions_monthly
+
+def most_popular(request):
+    with driver.session() as session:
+        most_popular = session.run("""
+                MATCH (t:Transaction)
+                UNWIND t.Product_Names AS Product
+                UNWIND t.Quantity_Per_Product AS Quantity 
+                WITH TRIM(Product) AS New_product, TOFLOAT(TRIM(Quantity)) AS New_quantity
+                WHERE New_quantity IS NOT NULL  
+                RETURN New_product, SUM(New_quantity) AS Total_product
+                ORDER BY Total_product DESC
+            """)
+        
+        products_sales = [(record['New_product'], record["Total_product"]) for record in most_popular]
+        
+        per_page = 5  
+        page_number = request.GET.get('page', 1)  
+        paginator = Paginator(products_sales, per_page)  
+        paginated_products = paginator.get_page(page_number)  
+    
+    return paginated_products
+
+def most_popular1(request):
+    #just get the first product most popular
+    #just return one product name
+    with driver.session() as session:
+        result = session.run("""
+            MATCH (t:Transaction)
+            UNWIND t.Product_Names AS Product
+            UNWIND t.Quantity_Per_Product AS Quantity 
+            WITH TRIM(Product) AS New_product, TOFLOAT(TRIM(Quantity)) AS New_quantity
+            WHERE New_quantity IS NOT NULL  
+            RETURN New_product, SUM(New_quantity) AS Total_product
+            ORDER BY Total_product DESC
+            LIMIT 1  // Limit to top product
+            """)
+        for record in result:
+            popular = record['New_product']
+            
+    return popular

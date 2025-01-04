@@ -28,6 +28,7 @@
             <ul>
                 <li><a href="{% url 'home' %}"><i class="material-icons">dashboard</i> Dashboard</a></li>
                 <li><a href="#Predictions"><i class="material-icons">insert_chart</i> Predictions</a></li>
+                {% comment %} <li><a href="#Delivery Driver Info"><i class="material-icons">information</i> Delivery Driver Info</a></li> {% endcomment %}
                 <li><a href="uploadcsv.html"><i class="material-icons">table_chart</i>Sales History</a></li>
                 <li><a href="{% url 'reports' %}"><i class="material-icons">report</i> Report</a></li>
                 <li><a href="{% url 'login' %}"><i class="material-icons">login</i> Login</a></li>
@@ -38,6 +39,7 @@
             <br><br><br>
             <li><a href="{% url 'home' %}"><i class="material-icons">dashboard</i> Dashboard</a></li>
             <li><a href="#Predictions"><i class="material-icons">insert_chart</i> Predictions</a></li>
+            {% comment %} <li><a href="#Delivery Driver Info"><i class="material-icons">information</i> Delivery Driver Info</a></li> {% endcomment %}
             <li><a href="uploadcsv.html"><i class="material-icons">table_chart</i>Sales History</a></li>
             <li><a href="{% url 'reports' %}"><i class="material-icons">report</i>Report</a></li>
             <li><a href="{% url 'login' %}"><i class="material-icons">login</i>Login</a></li>
@@ -116,6 +118,9 @@
         const neighborhoodSales = JSON.parse('{{ total_neighborhood_sales|safe|escapejs }}');
         const categories = JSON.parse('{{ categories|safe|escapejs }}');
         const quantities = JSON.parse('{{ quantities|safe|escapejs }}');
+        const month2 = JSON.parse('{{ month2|safe|escapejs }}');
+        const num_of_transactions= JSON.parse('{{ num_of_transactions|safe|escapejs }}');
+        const num_of_transactions_monthly= JSON.parse('{{ num_of_transactions_monthly|safe|escapejs }}');
         console.log('Categories:', categories);
         console.log('Quantities:', quantities);
     </script>
@@ -148,16 +153,16 @@
 
     </div>
     <div class="summary3" style="background: linear-gradient(to right, #8EC5FC,rgb(96, 131, 245));">
-        <h4> Number of delivery transactions </h4>
+        <h4> Total delivery transactions </h4>
         <p> {{num_of_transactions}} </p>
+        <span id="percent_change"></span>
         <!-- Blue colour  -->
 
     </div>
     <div class="summary4" style="background: linear-gradient(to right, #F2994A, #F2C94C);">
         <h4>Most Popular product</h4>
         <!-- yellow colour  -->
-         {% comment %} access the first element of the list and first key {% endcomment %}
-        <p >{{ products_sales.object_list.0.0 }} </p>
+        <p >{{ popular_product }} </p>
         {% comment %} If i want to get the quantity use this  {% endcomment %}
         {% comment %} {{ products_sales.object_list.0.1 }} {% endcomment %} 
     </div> 
@@ -240,9 +245,11 @@
          <canvas id="heatmap"></canvas>
          </div>
         </div>
+    <script src="{% static 'js/transaction.js' %}"></script>
     <script src="{% static 'js/line.js' %}"></script>
     <script src="{% static 'js/bar.js' %}"></script>
     <script src="{% static 'js/linesummary.js' %}"></script>
+
 
 </main>
 </body>
