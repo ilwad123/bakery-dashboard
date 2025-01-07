@@ -9,8 +9,7 @@ from django.conf import settings
 from datetime import datetime
 import json
 import pandas as pd
-
-
+from django.http import JsonResponse
 driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USERNAME, settings.NEO4J_PASSWORD))
 
 def home(request):
@@ -18,7 +17,6 @@ def home(request):
     neighbourhood,total_neighborhood_sales=bar_graph(request)
     products_sales=most_popular(request)
     categories,quantities=popular_category(request)
-    datetime1, total_sales = heatmap(request)
     num_of_drivers1 = num_of_drivers(request)
     num_of_transactions = num_of_transactions1(request)
     months2,num_of_transactions_monthly=num_of_transactions_monthly1(request)
@@ -31,9 +29,7 @@ def home(request):
         'neighbourhood': json.dumps(neighbourhood),
         'total_neighborhood_sales': json.dumps(total_neighborhood_sales),
         'categories': json.dumps(categories),
-        'quantities': json.dumps(quantities),
-        'datetime': datetime1,
-        'total_sales': total_sales,
+        'quantities': json.dumps(quantities), 
         'num_of_drivers': json.dumps(num_of_drivers1),
         'num_of_transactions': json.dumps(num_of_transactions),
         'num_of_transactions_monthly': json.dumps(num_of_transactions_monthly),
@@ -44,24 +40,14 @@ def home(request):
     return render(request, 'bakery.html', context)
 
 
-def create_datetime_dataframe(datetime1, total_sales):
-    # Check if lists are non-empty
-    if not datetime1 or not total_sales:
-        print("Data lists are empty. DataFrame not created.")
-        return None
-
-    # Create a DataFrame from datetime1 and total_sales
-    datetime_df = pd.DataFrame({'Datetime': datetime1, 'Total Sales': total_sales})
-
-    # Ensure that the file path is within your project directory (e.g., in MEDIA_ROOT)
-    file_path = os.path.join('datetime.csv')
-    
-    # Save the DataFrame to a CSV file with a proper file path
-    datetime_df.to_csv(file_path, index=False)
-    print(f"DataFrame saved to: {file_path}")
-
-    return datetime_df
-
+def get_data(request):
+    day_of_week, time_of_day, total_sales = heatmap(request)  
+    data = {  
+        'week_day': day_of_week,
+        'hour': time_of_day,
+        'volume_of_sales': total_sales
+    }
+    return JsonResponse(data)
 
 def login(request):
     return render(request,'login.html')
@@ -144,23 +130,32 @@ def popular_category(request):
 
     return categories,quantities
 
-#heatmap should have total volume sales day and hour wise
-def heatmap(request):  
+#heatmap should have total volume sales day and hour wise 
+def heatmap(request):
     with driver.session() as session:
-        heatmap = session.run("""
+        heatmap1 = session.run("""
             MATCH (t:Transaction)
-            WITH t.Datetime AS datetime, SUM(t.Total) AS total_sales
+            WITH t.Datetime AS datetime, t.Total AS total_sales
             RETURN datetime, total_sales
-            ORDER BY datetime
         """)
 
-        datetime1 = []
-        total_sales = []
-        for record in heatmap:
-            datetime1.append(record['datetime'])
-            total_sales.append(record["total_sales"])
-        
-    return datetime1, total_sales
+        day_of_week = []
+        time_of_day = []
+        total_heatmap_sales = []
+
+        # Process each record to extract day and time
+        for record in heatmap1:
+            # Extract datetime and total sales
+            datetime_str = record['datetime']
+            total_heatmap_sales = record['total_sales']
+
+            datetime_obj = datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S") 
+            day_of_week.append(datetime_obj.weekday())  
+            time_of_day.append(datetime_obj.hour)  
+
+            total_heatmap_sales.append(total_heatmap_sales)
+
+        return day_of_week, time_of_day, total_heatmap_sales
 
 def num_of_drivers(request):
     with driver.session() as session:
@@ -181,23 +176,28 @@ def num_of_transactions1(request):
         for record in result:
             num_of_transactions = record["num_of_transactions"]
     return num_of_transactions
-
 def num_of_transactions_monthly1(request):
     with driver.session() as session:
-        print("transaction")
+        print("Fetching monthly transactions")
         result = session.run("""
             MATCH (t:Transaction)
             WITH datetime({ year: t.Datetime.year, month: t.Datetime.month, day: 1 }) AS month, COUNT(t) AS num_of_transactions
             RETURN month, num_of_transactions
             ORDER BY month
         """)
-        months2 = []
-        num_of_transactions_monthly = []
+        
+        months2 = []  # List to hold the month names
+        num_of_transactions_monthly = []  # List to hold the number of transactions per month
+        
+        # Loop through the result and store the month and transaction count
         for record in result:
             dt = record["month"]
-            months2.append(dt.strftime("%b %Y"))
+            months2.append(dt.strftime("%b %Y"))  # Format month as "Month Year" (e.g., Jan 2025)
             num_of_transactions_monthly.append(record["num_of_transactions"]) 
+        
+    # Return the months and transaction counts
     return months2, num_of_transactions_monthly
+
 
 def most_popular(request):
     with driver.session() as session:

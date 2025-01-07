@@ -25,5 +25,7 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('reports/', views.reports, name='reports'),
     path('line_graph/', views.line_graph, name='line_graph'),
+    path('get_data/', views.get_data, name='get_data'),
 ]
+
 

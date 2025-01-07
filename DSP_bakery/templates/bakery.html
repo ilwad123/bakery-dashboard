@@ -1,5 +1,5 @@
-{% load static %}
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -118,11 +118,8 @@
         const neighborhoodSales = JSON.parse('{{ total_neighborhood_sales|safe|escapejs }}');
         const categories = JSON.parse('{{ categories|safe|escapejs }}');
         const quantities = JSON.parse('{{ quantities|safe|escapejs }}');
-        const month2 = JSON.parse('{{ month2|safe|escapejs }}');
-        const num_of_transactions= JSON.parse('{{ num_of_transactions|safe|escapejs }}');
         const num_of_transactions_monthly= JSON.parse('{{ num_of_transactions_monthly|safe|escapejs }}');
-        console.log('Categories:', categories);
-        console.log('Quantities:', quantities);
+        const month2 = JSON.parse('{{ month2|safe|escapejs }}');
     </script>
 <main>
     <div class="summary" style="background: linear-gradient(to right, #FF8AAE, #FF5C5C);">
@@ -153,6 +150,7 @@
 
     </div>
     <div class="summary3" style="background: linear-gradient(to right, #8EC5FC,rgb(96, 131, 245));">
+        <br>
         <h4> Total delivery transactions </h4>
         <p> {{num_of_transactions}} </p>
         <span id="percent_change"></span>
@@ -245,10 +243,12 @@
          <canvas id="heatmap"></canvas>
          </div>
         </div>
-    <script src="{% static 'js/transaction.js' %}"></script>
     <script src="{% static 'js/line.js' %}"></script>
     <script src="{% static 'js/bar.js' %}"></script>
     <script src="{% static 'js/linesummary.js' %}"></script>
+    <script src="{% static 'js/transaction.js' %}"></script>
+
+
 
 
 </main>
@@ -292,11 +292,12 @@ const donutChart = new Chart(myUniqueDonutCTX, {
 });
 
 </script>
-<script>
+{% comment %} <script>
     function toggleMenu() {
         const sidebar = document.querySelector('.sidebar');
         sidebar.classList.toggle('active');
     }
-<script>
+</script> {% endcomment %}
+
 
 </html>
