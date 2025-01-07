@@ -238,10 +238,15 @@ box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.1);
 .summary3 #percent_change {
     font-size: 14px;
     top: -15px;
-    font-weight: bold;
+    font-weight:bold;
     font-family: 'Montserrat', sans-serif;
     position: relative;
     color: white;
+}
+
+.summary3 #arrow2 {
+    margin-right: -60px;
+    margin-top: -20px; 
 }
 .summary3 h4{
     color: white;
