@@ -10,6 +10,13 @@ from datetime import datetime
 import json
 import pandas as pd
 from django.http import JsonResponse
+import matplotlib
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+matplotlib.use('Agg')
+
+
 driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USERNAME, settings.NEO4J_PASSWORD))
 
 def home(request):
@@ -20,8 +27,8 @@ def home(request):
     num_of_drivers1 = num_of_drivers(request)
     num_of_transactions = num_of_transactions1(request)
     months2,num_of_transactions_monthly=num_of_transactions_monthly1(request)
-    popular_product = most_popular1(request)  # Get the most popular product
-    
+    popular_product = most_popular1(request)
+    heatmap_path = plot_heatmap()
     context = {
         'months': json.dumps(months),
         'sales': json.dumps(sales),
@@ -35,26 +42,111 @@ def home(request):
         'num_of_transactions_monthly': json.dumps(num_of_transactions_monthly),
         'months2': json.dumps(months2),
         'popular_product': popular_product,
+        'heatmap_path': heatmap_path
     }
     print("context")
     return render(request, 'bakery.html', context)
 
 
-def get_data(request):
-    day_of_week, time_of_day, total_sales = heatmap(request)  
-    data = {  
-        'week_day': day_of_week,
-        'hour': time_of_day,
-        'volume_of_sales': total_sales
-    }
-    return JsonResponse(data)
+
+def heatmap(request):
+    # Execute the Neo4j query to fetch datetime and total_sales
+    with driver.session() as session:
+        heatmap1 = session.run("""
+        MATCH (t:Transaction)
+        WITH t.Datetime AS datetime, t.Total AS total_sales
+        // Extract day and hour from the datetime
+        WITH datetime, total_sales,
+                toInteger(date(datetime).dayOfWeek) AS day_of_week, 
+                toInteger(datetime.hour) AS hour_of_day
+        // get total sales by day and hour
+        RETURN day_of_week, hour_of_day, SUM(total_sales) AS total_sales
+        ORDER BY day_of_week, hour_of_day
+        """)
+
+        
+        day_of_week = []
+        time_of_day = []
+        total_sales = []  
+
+        # Get the datetime and total_sales values from the query 
+        for record in heatmap1: 
+                day = record['day_of_week']
+                hour = record['hour_of_day']
+                sales = record['total_sales']
+                
+                # Update the lists with the values
+                day_of_week.append(day)
+                time_of_day.append(hour)
+                total_sales.append(sales)
+
+        return day_of_week, time_of_day, total_sales
+ 
+
+def plot_heatmap():
+    # Assuming the heatmap function returns day_of_week, time_of_day, and total_sales
+    day_of_week, time_of_day, total_sales = heatmap(None)
+    # Create a 7x24 matrix to store the sales data
+    sales_matrix = np.zeros((7, 24))
+    #goes through each record and assigns sales to the specific day and hour 
+    for i in range(len(day_of_week)):
+        day = day_of_week[i]   - 1
+        hour = time_of_day[i]
+        sales = total_sales[i]
+        # print(f"Day: {day}, Hour: {hour}, Sales: {sales}") used for debugging
+        
+        sales_matrix[day, hour] = sales
+
+    hours1 = [f'{hour}:00' for hour in range(9, 24)]  # Hours from 9 to 23 
+
+    # Plot the heatmap
+    plt.figure(figsize=(12, 6))
+    sns.heatmap(sales_matrix[:, 9:], cmap='YlGnBu', annot=True, fmt=".2f",  
+                xticklabels=hours1, 
+                yticklabels=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
+
+    plt.title('Heatmap of Sales Volume by Day and Hour')
+    plt.xlabel('Hour of the Day (9-23)')
+    plt.ylabel('Day of the Week (Monday to Sunday)')
+    plt.tight_layout()
+    # Save the plot as an image
+    filepath = "static/data_files/sales_heatmap.png"
+    plt.savefig(filepath)
+    plt.close()
+    return filepath
+
+
+# #heatmap should have total volume sales day and hour wise 
+# def heatmap(request):
+#     with driver.session() as session:
+#         heatmap1 = session.run("""
+#             MATCH (t:Transaction)
+#             WITH t.Datetime AS datetime, t.Total AS total_sales
+#             RETURN datetime, total_sales
+#         """)
+#         day_of_week = []
+#         time_of_day = []
+#         total_heatmap_sales = []
+
+#         # Process each record to extract day and time
+#         for record in heatmap1:
+#             # Extract datetime and total sales
+#             datetime_str = record['datetime']
+#             total_heatmap_sales = record['total_sales']
+
+#             datetime_obj = datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S") 
+#             day_of_week.append(datetime_obj.weekday())  
+#             time_of_day.append(datetime_obj.hour)  
+
+#             total_heatmap_sales.append(total_heatmap_sales)
+
+#         return day_of_week, time_of_day, total_heatmap_sales
 
 def login(request):
     return render(request,'login.html')
 
 def reports(request):
     return render(request,'reports.html')
-
 
 def my_view(request):
     # Open a session to run the Neo4j query
@@ -129,33 +221,6 @@ def popular_category(request):
                 quantities.append(record["Total_quantity"])
 
     return categories,quantities
-
-#heatmap should have total volume sales day and hour wise 
-def heatmap(request):
-    with driver.session() as session:
-        heatmap1 = session.run("""
-            MATCH (t:Transaction)
-            WITH t.Datetime AS datetime, t.Total AS total_sales
-            RETURN datetime, total_sales
-        """)
-
-        day_of_week = []
-        time_of_day = []
-        total_heatmap_sales = []
-
-        # Process each record to extract day and time
-        for record in heatmap1:
-            # Extract datetime and total sales
-            datetime_str = record['datetime']
-            total_heatmap_sales = record['total_sales']
-
-            datetime_obj = datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S") 
-            day_of_week.append(datetime_obj.weekday())  
-            time_of_day.append(datetime_obj.hour)  
-
-            total_heatmap_sales.append(total_heatmap_sales)
-
-        return day_of_week, time_of_day, total_heatmap_sales
 
 def num_of_drivers(request):
     with driver.session() as session:
