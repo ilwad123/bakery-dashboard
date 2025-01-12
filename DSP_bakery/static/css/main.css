@@ -158,7 +158,7 @@ p{
     float: left;
     margin-left: 70px;
     width: 350px;
-    height: 50vh;
+    height: 57vh;
     font-family: 'Poppins', sans-serif;
     margin-top:30px;
 }
@@ -178,7 +178,7 @@ p{
     width: 108vh;
     margin-top:30px;
     /* margin-bottom: 20px; use this for the last card to give space for the bottom of the page */
-    height:60vh;
+    height:61vh;
     float:inline-start;
 }
 
