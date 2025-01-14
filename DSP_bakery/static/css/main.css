@@ -34,9 +34,7 @@ main{
     padding: 15px 20px; 
     border-bottom: 1px solid #e0e0e0; 
     transition: background-color 300ms ease, color 300ms ease; 
-
 }
-
 
 .sidebar i {
     margin-right:10px;
@@ -59,8 +57,6 @@ main{
     background-color: white; 
 
     }
-
-    
     
 ul{
     list-style: none;

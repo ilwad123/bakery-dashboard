@@ -3,22 +3,32 @@ from django.shortcuts import render
 from django.shortcuts import render
 from neo4j import GraphDatabase
 import os
-from django.conf import settings
+#used to hash passwords and the authenticate function
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from django.contrib.auth.models import User
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
+#used to make pages that are paginated
 from django.core.paginator import Paginator
 from django.conf import settings
 from datetime import datetime
 import json
-import pandas as pd
 from django.http import JsonResponse
+#used to create heatmaps
 import matplotlib
 import numpy as np
+import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+
 matplotlib.use('Agg')
 
 
 driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USERNAME, settings.NEO4J_PASSWORD))
 
+@login_required(login_url="/login/")
 def home(request):
     months, sales = line_graph(request)
     neighbourhood,total_neighborhood_sales=bar_graph(request)
@@ -47,8 +57,43 @@ def home(request):
     print("context")
     return render(request, 'bakery.html', context)
 
+def logged_in_login(request):
+    if request.method == "POST":
+        username = request.POST['username']
+        password = request.POST['password']
 
+        print(f"Attempting to authenticate user: {username}")
 
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            print("Authentication successful!")
+            login(request, user)
+            return redirect('home')
+        else:
+            print("Authentication failed!")
+            return render(request, 'login.html', {'error': 'Invalid username or password'})
+
+    return render(request, 'login.html')
+
+    
+def logout_view(request):
+    logout(request)
+    # Redirect to a login page.
+    return redirect('login')
+    
+def login_page(request):
+    return render(request,'login.html')
+
+# def create_admin():
+#     user, created = User.objects.get_or_create(username="admin")
+#     if created:
+#         user.set_password("bakery123")  # Password is hashed when set
+#         user.save()
+#     return HttpResponse("Admin created")
+
+# create_admin()  # Passing None as request, since we're in shell
+#finish by create_admin in shell 
 def heatmap(request):
     # Execute the Neo4j query to fetch datetime and total_sales
     with driver.session() as session:
@@ -116,34 +161,6 @@ def plot_heatmap():
     return filepath
 
 
-# #heatmap should have total volume sales day and hour wise 
-# def heatmap(request):
-#     with driver.session() as session:
-#         heatmap1 = session.run("""
-#             MATCH (t:Transaction)
-#             WITH t.Datetime AS datetime, t.Total AS total_sales
-#             RETURN datetime, total_sales
-#         """)
-#         day_of_week = []
-#         time_of_day = []
-#         total_heatmap_sales = []
-
-#         # Process each record to extract day and time
-#         for record in heatmap1:
-#             # Extract datetime and total sales
-#             datetime_str = record['datetime']
-#             total_heatmap_sales = record['total_sales']
-
-#             datetime_obj = datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S") 
-#             day_of_week.append(datetime_obj.weekday())  
-#             time_of_day.append(datetime_obj.hour)  
-
-#             total_heatmap_sales.append(total_heatmap_sales)
-
-#         return day_of_week, time_of_day, total_heatmap_sales
-
-def login(request):
-    return render(request,'login.html')
 
 def reports(request):
     return render(request,'reports.html')

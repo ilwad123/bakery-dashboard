@@ -36,8 +36,11 @@
 
        <li><a href="{% url 'reports' %}"><i class="material-icons">report</i>Report</a></li>
 
-       <li><a href="{% url 'login' %}"><i class="material-icons">login</i>login</a></li>
-
+       {% if user.is_authenticated %}
+            <li><a href="{% url 'logout' %}"><i class="material-icons">logout</i> Logout</a></li>
+        {% else %}
+            <li><a href="{% url 'login' %}"><i class="material-icons">login</i> Login</a></li>
+        {% endif %}
       </ul>
     </div>
     <fieldset>
@@ -49,7 +52,8 @@
       <br>
       <div class="content">
         <p style="color:red;">{{error}}</p>
-      <form action="/Login" method="POST">
+      <form action="/login/" method="POST">
+        {% csrf_token %}
         <div class="user">
               <div class="name">
               <div class="input-box">
