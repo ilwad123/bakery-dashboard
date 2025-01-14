@@ -3,6 +3,8 @@ from django.shortcuts import render
 from django.shortcuts import render
 from neo4j import GraphDatabase
 import os
+from django import forms
+from captcha.fields import CaptchaField
 #used to hash passwords and the authenticate function
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
@@ -28,6 +30,7 @@ matplotlib.use('Agg')
 
 driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USERNAME, settings.NEO4J_PASSWORD))
 
+#would not allow to access home page without logging in
 @login_required(login_url="/login/")
 def home(request):
     months, sales = line_graph(request)
@@ -57,24 +60,35 @@ def home(request):
     print("context")
     return render(request, 'bakery.html', context)
 
+class CaptchaTestForm(forms.Form):
+    captcha = CaptchaField() 
+    
 def logged_in_login(request):
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
+        form = CaptchaTestForm(request.POST)
 
-        print(f"Attempting to authenticate user: {username}")
+        if form.is_valid():
+            print(f"Attempting to authenticate user: {username}")
+            #checks if user info matches
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                print("Authentication successful!")
+                login(request, user)
+                return redirect('home')
+            else:
+                print("Authentication failed!")
+                return render(request, 'login.html',  {'form': form, 'error': 'Invalid username or password'})
 
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
-            print("Authentication successful!")
-            login(request, user)
-            return redirect('home')
         else:
-            print("Authentication failed!")
-            return render(request, 'login.html', {'error': 'Invalid username or password'})
+            return render(request, 'login.html', {'form': form, 'error': "Invalid CAPTCHA. Please try again."})
+    else:
+        form = CaptchaTestForm()
 
-    return render(request, 'login.html')
+    return render(request, 'login.html',  {'form': form})
+
+
 
     
 def logout_view(request):
@@ -109,7 +123,7 @@ def heatmap(request):
         ORDER BY day_of_week, hour_of_day
         """)
 
-        
+        #initilise empty lists to store the values
         day_of_week = []
         time_of_day = []
         total_sales = []  
@@ -161,12 +175,14 @@ def plot_heatmap():
     return filepath
 
 
-
+def upload(request):
+    return render(request,'uploadcsv.html')
 def reports(request):
     return render(request,'reports.html')
 
 def my_view(request):
-    # Open a session to run the Neo4j query
+    # Open a session to run the Neo4j query to see if it works 
+    #use the print statement to see if the view is triggered
     with driver.session() as session:
         # Run a simple query to fetch nodes
         result = session.run("MATCH (n) RETURN n LIMIT 10")
@@ -182,11 +198,15 @@ def line_graph(request):
             ORDER BY month
         """)
 
+        #initalise empty lists to store the values
         months = []
         sales = []
+        #check through the records and append the values to the lists
         for record in monthly_sales:
             dt = record["month"]
+            # Format month as "Month Year" (e.g., Jan 2025)
             months.append(dt.strftime("%b %Y"))
+            # Round the sales to 2 decimal places
             sales.append(round(record["monthly_sales"], 2))
 
         # print("Months:", months)
@@ -204,9 +224,12 @@ def bar_graph(request):
             RETURN Place , total_neighborhood_sales
             ORDER BY total_neighborhood_sales
         """)
+        #initialise empty lists to store the values
         neighbourhood = []
         total_neighborhood_sales= []
+        #check through the records and append the values to the lists
         for record in neighbourhoodsales:
+            # Append the neighbourhood and total sales to the lists
             neighbourhood.append(record['Place'])
             total_neighborhood_sales.append(record["total_neighborhood_sales"])
 
@@ -231,8 +254,10 @@ def popular_category(request):
 
             """)
             
+            #initialise empty lists to store the values
             categories = []
             quantities= []
+            #check through the records and append the values to the lists
             for record in category1:
                 categories.append(record['Category'])
                 quantities.append(record["Total_quantity"])
@@ -293,11 +318,17 @@ def most_popular(request):
                 ORDER BY Total_product DESC
             """)
         
+        
         products_sales = [(record['New_product'], record["Total_product"]) for record in most_popular]
         
+        # Paginate the products
+        #5 per page 
         per_page = 5  
+        #get the page number from the request
         page_number = request.GET.get('page', 1)  
-        paginator = Paginator(products_sales, per_page)  
+        #create a paginator object
+        paginator = Paginator(products_sales, per_page)
+        #get the products for the page number  
         paginated_products = paginator.get_page(page_number)  
     
     return paginated_products
@@ -305,6 +336,7 @@ def most_popular(request):
 def most_popular1(request):
     #just get the first product most popular
     #just return one product name
+    #used to be displayed in a small card at the top of the page
     with driver.session() as session:
         result = session.run("""
             MATCH (t:Transaction)
