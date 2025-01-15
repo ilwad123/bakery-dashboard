@@ -42,6 +42,7 @@ def home(request):
     months2,num_of_transactions_monthly=num_of_transactions_monthly1(request)
     popular_product = most_popular1(request)
     heatmap_path = plot_heatmap()
+    popular_asso=popular_product_association_list(request)
     context = {
         'months': json.dumps(months),
         'sales': json.dumps(sales),
@@ -55,7 +56,8 @@ def home(request):
         'num_of_transactions_monthly': json.dumps(num_of_transactions_monthly),
         'months2': json.dumps(months2),
         'popular_product': popular_product,
-        'heatmap_path': heatmap_path
+        'heatmap_path': heatmap_path,
+        'popular_asso':popular_asso,
     }
     print("context")
     return render(request, 'bakery.html', context)
@@ -305,7 +307,6 @@ def num_of_transactions_monthly1(request):
     # Return the months and transaction counts
     return months2, num_of_transactions_monthly
 
-
 def most_popular(request):
     with driver.session() as session:
         most_popular = session.run("""
@@ -352,3 +353,46 @@ def most_popular1(request):
             popular = record['New_product']
             
     return popular
+
+def popular_product_association_list(request):
+    print("Popular product association list view triggered!")  # Debugging line to ensure function is called
+    
+    with driver.session() as session:
+        print("hello this works")  # Check if the function is being entered
+        
+        # Running the Cypher query to get product pair counts
+        query = """
+              MATCH (t:Transaction)
+                UNWIND t.Product_Names AS Product1
+                UNWIND t.Product_Names AS Product2
+                WITH TRIM(Product1) AS P1, TRIM(Product2) AS P2, t.Datetime AS TransactionDate
+                WHERE P1 <> P2
+                WITH CASE WHEN P1 < P2 THEN P1 ELSE P2 END AS P1, 
+                        CASE WHEN P1 < P2 THEN P2 ELSE P1 END AS P2, 
+                        COUNT(DISTINCT TransactionDate) AS PairCount
+                ORDER BY PairCount DESC
+                RETURN P1 AS Product1, P2 AS Product2, PairCount AS Frequency
+        """
+        
+        print("Running query...")
+        popular2 = session.run(query)
+        print("Database query executed.")
+
+        # Convert popular2 result to a list of tuples for easier reading
+        popular_asso = [(record['Product1'], record['Product2'], record['Frequency']) for record in popular2]
+        
+         # Paginate the products
+        #5 per page 
+        per_page1= 5
+        #get the page number from the request
+        page_number1 = request.GET.get('page', 1)  
+        #create a paginator object
+        paginator1 = Paginator(popular_asso, per_page1)
+        #get the products for the page number  
+        paginated_products1 = paginator1.get_page(page_number1) 
+        # print(paginated_products1)
+        print("First few product associations:", popular_asso[:5])  # Debugging line
+
+    # Return the processed list of product associations
+    return paginated_products1
+

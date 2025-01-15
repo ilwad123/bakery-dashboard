@@ -246,6 +246,45 @@
     <div class="card4">
             <img id="heatmap-image" src="{{ heatmap_path }}?v={{ timestamp }}" alt="Heatmap" style="width: 103%; height: 100%;">
          </div>
+         <div class="card5">
+            <h1>Top Product Associations</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product 1</th>
+                        <th>Product 2</th>
+                        <th>Frequency</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product1, product2, frequency in popular_asso %}
+                        <tr>
+                            <td>{{ product1 }}</td>
+                            <td>{{ product2 }}</td>
+                            <td>{{ frequency }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3">No product associations found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="pagination">
+                {% if paginated_products1.has_previous %}
+                    <a href="?page={{ paginated_products1.previous_page_number }}">⇐</a>
+                {% endif %}
+                {% for num in paginated_products1.paginator1.page_range %}
+                    {% if paginated_products1.number == num1 %}
+                        <strong>{{ num1 }}</strong>
+                    {% else %}
+                        <a href="?page={{ num1 }}">{{ num1 }}</a>
+                    {% endif %}
+                {% endfor %}
+                {% if paginated_products1.has_next %}
+                    <a href="?page={{ paginated_products1.next_page_number }}">⇒</a>
+                {% endif %}
+            </div>
         </div>
     <script src="{% static 'js/line.js' %}"></script>
     <script src="{% static 'js/bar.js' %}"></script>
