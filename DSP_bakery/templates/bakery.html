@@ -11,6 +11,8 @@
     
     <!-- FontAwesome from alternative CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+
     <!-- Load Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -266,7 +268,7 @@
             <img id="heatmap-image" src="{{ heatmap_path }}?v={{ timestamp }}" alt="Heatmap" style="width: 103%; height: 100%;">
          </div>
          <div class="card5">
-            <h1>Top Product Associations</h1>
+            <h2>Top Product Associations</h2>
             <button class="export_pdf">Export PDF</button>
             <table>
                 <thead>
@@ -311,58 +313,71 @@
                         <li><a href="?page_associations={{ popular_asso.next_page_number }}">⇒</a></li>
                     {% endif %}
                 </ul>
-            </div>            
+            </div>          
+            <div id="map">
+                <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+                <script src="{% static 'js/map.js' %}"></script>
         </div>
+    </div>
         
     <script src="{% static 'js/line.js' %}"></script>
     <script src="{% static 'js/bar.js' %}"></script>
     <script src="{% static 'js/linesummary.js' %}"></script>
     <script src="{% static 'js/transaction.js' %}"></script>
-
-
-
-
 </main>
 </body>
 <script>
     //donut javascript 
-const myUniqueDonutCTX = document.getElementById('donut').getContext('2d');
+    const myUniqueDonutCTX = document.getElementById('donut').getContext('2d');
 
-const donutChart = new Chart(myUniqueDonutCTX, {
-    type: 'doughnut',
-    data: {
-        labels: categories,
-        datasets: [{
-            data: quantities,
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.4)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                position: 'bottom',
-            },
-            title: {
-                display: true,
-                text: 'Total Sales per Product'
+    const donutChart = new Chart(myUniqueDonutCTX, {
+        type: 'doughnut',
+        data: {
+            labels: categories, 
+            datasets: [{
+                data: quantities, 
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.4)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                title: {
+                    display: true,
+                    text: 'Total Sales per Product'
+                },
+                tooltip: { 
+                    callbacks: {
+                        label: function (tooltipItem) {
+                            const dataset = this.chart.data.datasets[tooltipItem.datasetIndex];
+                            //get the sum of the quantites and iterates through the array
+                            //initially at zero 
+                            const total = dataset.data.reduce((sum, value) => sum + value, 0);
+                            const currentValue = dataset.data[tooltipItem.dataIndex];
+                            const percentage = Math.floor(((currentValue / total) * 100) + 0.5);
+                            return percentage + "%" + ',' + currentValue;
+                        }
+                    }
+                }
             }
         }
-    }
-});
-
+    });    
+    
 </script>
 {% comment %} <script>
     function toggleMenu() {
