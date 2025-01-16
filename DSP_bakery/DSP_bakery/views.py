@@ -24,6 +24,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from django.shortcuts import render
 
 matplotlib.use('Agg')
 
@@ -109,7 +110,6 @@ def login_page(request):
 #     return HttpResponse("Admin created")
 
 # create_admin()  # Passing None as request, since we're in shell
-#finish by create_admin in shell 
 def heatmap(request):
     # Execute the Neo4j query to fetch datetime and total_sales
     with driver.session() as session:
@@ -319,7 +319,6 @@ def most_popular(request):
                 ORDER BY Total_product DESC
             """)
         
-        
         products_sales = [(record['New_product'], record["Total_product"]) for record in most_popular]
         
         # Paginate the products
@@ -354,6 +353,7 @@ def most_popular1(request):
             
     return popular
 
+
 def popular_product_association_list(request):
     print("Popular product association list view triggered!")  # Debugging line to ensure function is called
     
@@ -382,17 +382,11 @@ def popular_product_association_list(request):
         popular_asso = [(record['Product1'], record['Product2'], record['Frequency']) for record in popular2]
         
          # Paginate the products
-        #5 per page 
-        per_page1= 5
-        #get the page number from the request
-        page_number1 = request.GET.get('page', 1)  
-        #create a paginator object
+        per_page1 = 5
+        page_number1 = request.GET.get('page_associations', 1)
         paginator1 = Paginator(popular_asso, per_page1)
-        #get the products for the page number  
         paginated_products1 = paginator1.get_page(page_number1) 
-        # print(paginated_products1)
         print("First few product associations:", popular_asso[:5])  # Debugging line
 
-    # Return the processed list of product associations
+    # Pass paginated results to the template
     return paginated_products1
-

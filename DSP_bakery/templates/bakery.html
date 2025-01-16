@@ -70,6 +70,26 @@
             display: inline-block;
             margin-right: 5px; 
         }
+        .pagination {
+            text-align: left;
+            
+            display: flex;
+            justify-content: center; /* Center pagination inside the card */
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+            margin: 0;
+            padding: 0; 
+        }
+        
+        .pagination-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .pagination-links li {
+            display: inline-block;
+            margin-right: 5px; 
+        }
         
         .pagination-links a,
         .pagination-links li strong {
@@ -151,6 +171,7 @@
         <h4>Number of Delivery Drivers</h4>
         <p>{{num_of_drivers}}</span></p>
         <!-- Purple colour  -->
+         {% comment %} maybe change it to pending orders instead {% endcomment %}
 
     </div>
     <div class="summary3" style="background: linear-gradient(to right, #8EC5FC,rgb(96, 131, 245));">
@@ -159,8 +180,6 @@
         <p> {{num_of_transactions}} </p>
         {% comment %} <span id="arrow2"></span> {% endcomment %}
         <span id="percent_change"></span>
-        <!-- Blue colour  -->
-
     </div>
     <div class="summary4" style="background: linear-gradient(to right, #F2994A, #F2C94C);">
         <h4>Most Popular product</h4>
@@ -248,6 +267,7 @@
          </div>
          <div class="card5">
             <h1>Top Product Associations</h1>
+            <button class="export_pdf">Export PDF</button>
             <table>
                 <thead>
                     <tr>
@@ -270,22 +290,30 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <div class="pagination">
-                {% if paginated_products1.has_previous %}
-                    <a href="?page={{ paginated_products1.previous_page_number }}">⇐</a>
-                {% endif %}
-                {% for num in paginated_products1.paginator1.page_range %}
-                    {% if paginated_products1.number == num1 %}
-                        <strong>{{ num1 }}</strong>
-                    {% else %}
-                        <a href="?page={{ num1 }}">{{ num1 }}</a>
+            <div class="pagination1">
+                <ul class="pagination-links1">
+                    {% if popular_asso.has_previous %}
+                        <li><a href="?page_associations={{ popular_asso.previous_page_number }}">⇐</a></li>
                     {% endif %}
-                {% endfor %}
-                {% if paginated_products1.has_next %}
-                    <a href="?page={{ paginated_products1.next_page_number }}">⇒</a>
-                {% endif %}
-            </div>
+                        {% comment %} Loop through the entire page range available in the paginator {% endcomment %}
+                        {% for num in popular_asso.paginator.page_range %}
+                        {% comment %} on the current page would add 5 pages on both sides if they fall within the range  {% endcomment %}
+                            {% if num > popular_asso.number|add:"-5" and num < popular_asso.number|add:"5" %}
+                             {% comment %} if it is true displays the new page numbers {% endcomment %}
+                                {% if popular_asso.number == num %}
+                                    <li><strong>{{ num }}</strong></li>
+                                {% else %}
+                                    <li><a href="?page_associations={{ num }}">{{ num }}</a></li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}            
+                    {% if popular_asso.has_next %}
+                        <li><a href="?page_associations={{ popular_asso.next_page_number }}">⇒</a></li>
+                    {% endif %}
+                </ul>
+            </div>            
         </div>
+        
     <script src="{% static 'js/line.js' %}"></script>
     <script src="{% static 'js/bar.js' %}"></script>
     <script src="{% static 'js/linesummary.js' %}"></script>
@@ -297,6 +325,7 @@
 </main>
 </body>
 <script>
+    //donut javascript 
 const myUniqueDonutCTX = document.getElementById('donut').getContext('2d');
 
 const donutChart = new Chart(myUniqueDonutCTX, {

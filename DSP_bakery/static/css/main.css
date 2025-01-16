@@ -208,6 +208,70 @@ p{
     background-color: #f0f0f0;
 }
 
+.pagination1 {
+    margin-top: auto; /* Push the pagination to the bottom of the card */
+    text-align: center; 
+    flex-wrap: wrap;
+
+}
+
+.pagination-links1 {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: inline-flex;
+    gap: 8px; 
+    flex-wrap: wrap;
+}
+
+.pagination-links1 a,
+.pagination-links1 li strong {
+    display: inline-block;
+    text-decoration: none;
+    padding: 5px 10px;
+    border: 1px solid #6C244C;
+    border-radius: 7px;
+    font-size: 18px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    transition: 0.3s ease-in-out;
+}
+.export_pdf{
+    background-color: #F2F2F2;
+    color: #555;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 12px;
+    margin-bottom: auto;
+    font-size: 0.9rem;
+}
+.pagination-links1 a {
+    color: white;
+    background-color: #6C244C;
+    font-weight: 300;
+}
+
+.pagination-links1 a:hover {
+    background-color: #888;
+    color: white;
+}
+
+.pagination-links1 li strong:hover {
+    background-color: white;
+    color: #6C244C;
+    border-color: #6C244C;
+}
+.pagination-links1 li strong {
+    color: #6C244C;
+    background-color: white;
+    font-weight: bold;
+    cursor: default;
+    margin-right: 5px; 
+}
+.card5 ul li {
+    font-size: 17px; 
+    font-weight: 500;
+    margin-bottom: 10px; 
+}
 .summary,.summary2,.summary3,.summary4{
     background-color: white;
     border-radius: 16px;
