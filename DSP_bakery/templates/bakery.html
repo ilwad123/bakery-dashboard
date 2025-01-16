@@ -15,6 +15,9 @@
 
     <!-- Load Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+
+
 </head>
 
 <body>
@@ -270,9 +273,10 @@
          <div class="card5">
             <h2>Top Product Associations</h2>
             <button class="export_pdf">Export PDF</button>
-            <table>
+            <table id="sortable">                
                 <thead>
                     <tr>
+                        <th>Order</th>
                         <th>Product 1</th>
                         <th>Product 2</th>
                         <th>Frequency</th>
@@ -280,7 +284,8 @@
                 </thead>
                 <tbody>
                     {% for product1, product2, frequency in popular_asso %}
-                        <tr>
+                        <tr class="item">
+                            <td>{{ forloop.counter0|add:popular_asso.start_index}}</td> <!-- Order column -->
                             <td>{{ product1 }}</td>
                             <td>{{ product2 }}</td>
                             <td>{{ frequency }}</td>
@@ -324,6 +329,8 @@
     <script src="{% static 'js/bar.js' %}"></script>
     <script src="{% static 'js/linesummary.js' %}"></script>
     <script src="{% static 'js/transaction.js' %}"></script>
+    <script src="{% static 'js/sortable.js' %}"></script>
+
 </main>
 </body>
 <script>
