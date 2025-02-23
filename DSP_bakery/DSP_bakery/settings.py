@@ -128,6 +128,6 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # settings.py
 NEO4J_URI = "bolt://localhost:7687" 
-NEO4J_USERNAME = "neo4j"             # Replace with your Neo4j username
-NEO4J_PASSWORD = "12345678"     # Replace with your Neo4j password
+NEO4J_USERNAME = "neo4j"             # Replace with  Neo4j username
+NEO4J_PASSWORD = "12345678"     # Replace with  Neo4j password
 

@@ -25,25 +25,41 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from django.shortcuts import render
+from django.utils.cache import patch_cache_control
+
+import openmeteo_requests
+import requests_cache
+import pandas as pd
+from retry_requests import retry
+from datetime import date, timedelta
+
+# Set up logging
 
 matplotlib.use('Agg')
 
 
 driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USERNAME, settings.NEO4J_PASSWORD))
 
-#would not allow to access home page without logging in
 @login_required(login_url="/login/")
 def home(request):
     months, sales = line_graph(request)
-    neighbourhood,total_neighborhood_sales=bar_graph(request)
-    products_sales=most_popular(request)
-    categories,quantities=popular_category(request)
+    neighbourhood, total_neighborhood_sales = bar_graph(request)
+    products_sales = most_popular(request)
+    categories, quantities = popular_category(request)
     num_of_drivers1 = num_of_drivers(request)
     num_of_transactions = num_of_transactions1(request)
-    months2,num_of_transactions_monthly=num_of_transactions_monthly1(request)
+    months2, num_of_transactions_monthly = num_of_transactions_monthly1(request)
     popular_product = most_popular1(request)
     heatmap_path = plot_heatmap()
-    popular_asso=popular_product_association_list(request)
+    month_heatmap=plot_monthly_heatmap()
+    holiday_heatmap=plot_holiday_heatmap()
+    popular_asso = popular_product_association_list(request)
+    # weather_data = weather_heatmap(request)
+
+    
+    
+    timestamp = int(datetime.now().timestamp())
+
     context = {
         'months': json.dumps(months),
         'sales': json.dumps(sales),
@@ -58,15 +74,28 @@ def home(request):
         'months2': json.dumps(months2),
         'popular_product': popular_product,
         'heatmap_path': heatmap_path,
-        'popular_asso':popular_asso,
+        'popular_asso': popular_asso,
+        'timestamp':timestamp,
+        'month_heatmap':month_heatmap,
+        'holiday_heatmap':holiday_heatmap,
+        # 'weather_data': weather_data  # Include weather data in context
+
     }
-    print("context")
-    return render(request, 'bakery.html', context)
+    
+
+    # PREVENTS UNAUTHORISED ACESS WHEN LOGGED OUT ALREADY 
+    # Clears the browser cache for this page.
+    response = render(request, 'bakery.html', context)
+    patch_cache_control(response, no_cache=True, no_store=True, must_revalidate=True)
+
+    return response
+
 
 class CaptchaTestForm(forms.Form):
     captcha = CaptchaField() 
     
 def logged_in_login(request):
+    #gets the inputs from the form 
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
@@ -102,14 +131,6 @@ def logout_view(request):
 def login_page(request):
     return render(request,'login.html')
 
-# def create_admin():
-#     user, created = User.objects.get_or_create(username="admin")
-#     if created:
-#         user.set_password("bakery123")  # Password is hashed when set
-#         user.save()
-#     return HttpResponse("Admin created")
-
-# create_admin()  # Passing None as request, since we're in shell
 def heatmap(request):
     # Execute the Neo4j query to fetch datetime and total_sales
     with driver.session() as session:
@@ -176,9 +197,246 @@ def plot_heatmap():
     plt.close()
     return filepath
 
+def heatmap_month_day(request):
+    with driver.session() as session:
+        heatmap1 = session.run("""
+        MATCH (t:Transaction)
+        WITH t.Datetime AS datetime, t.Total AS total_sales
+        // Extract month and day of the week
+        WITH datetime, total_sales,
+             toInteger(date(datetime).month) AS month_sales, 
+             toInteger(datetime.dayOfWeek) AS day_of_week  
+        // Get total sales by month and day
+        RETURN month_sales, day_of_week, SUM(total_sales) AS total_sales
+        ORDER BY month_sales, day_of_week
+        """)
 
+        days_sales = []
+        month_sales = []
+        total_sales_month = []
+
+        for record in heatmap1:
+            days_sales.append(record['day_of_week'])
+            month_sales.append(record['month_sales'])
+            total_sales_month.append(record['total_sales'])
+
+    return days_sales, month_sales, total_sales_month
+
+def plot_monthly_heatmap():
+    # Assuming the heatmap function returns day_of_week, time_of_day, and total_sales
+    days_sales, month_sales, total_sales_month = heatmap_month_day(None)
+    # Create a 12x7 matrix to store the sales data
+    sales_matrix = np.zeros((12, 7))
+    #goes through each record and assigns sales to the specific day and hour 
+    for i in range(len(days_sales)):
+        month = month_sales[i] - 1
+        day = days_sales[i] -1 
+        sales = total_sales_month[i]
+        # print(f"Month: {month}, Hour: {hour}, Sales: {sales}") used for debugging
+        
+        sales_matrix[month, day] = sales
+
+    # Plot the heatmap
+    plt.figure(figsize=(12, 6))
+    sns.heatmap(sales_matrix[:,:], cmap='YlGnBu', annot=True, fmt=".2f",  
+                xticklabels=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+                yticklabels=["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"])
+
+    plt.title('Heatmap of Sales Volume by Month and Day')
+    plt.xlabel('Day of the Week (Monday to Sunday)')
+    plt.ylabel('Months')
+    plt.tight_layout()
+    # Save the plot as an image
+    filepath = "static/data_files/monthly_sales.png"
+    plt.savefig(filepath)
+    plt.close()
+    return filepath
+
+
+
+# def weather_heatmap(request):
+#     with driver.session() as session:
+#         result = session.run("""
+#             MATCH (t:Transaction)
+#             RETURN t.Datetime AS datetime, t.Location AS location
+#         """)
+        
+#         data = []
+#         for record in result:
+#             # Assuming the 'location' is a Point and you need latitude and longitude
+#             location = record['location']
+#             latitude = location.latitude
+#             longitude = location.longitude
+#             date1 = record['datetime']  # This is your date to pass into the weather API
+            
+#             # Now call the weather API with the extracted parameters
+#             weather_data = get_weather_api(date1, latitude, longitude)
+
+#             # You can process the weather_data further here if needed
+#             data.append({
+#                 'datetime': record['datetime'],
+#                 'latitude': latitude,
+#                 'longitude': longitude,
+#                 'weather_data': weather_data  # Store the weather data with each record
+#             })
+
+#         print(data)
+#         return data
+
+# def get_weather_api(date1,latitude,longitude):   
+#     date1 = date1.strftime('%Y-%m-%d') 
+#     url = 'https://api.open-meteo.com/v1/forecast'
+#     cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
+#     retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
+#     openmeteo = openmeteo_requests.Client(session = retry_session)
+
+#     # Make sure all required weather variables are listed here
+#     # The order of variables in hourly or daily is important to assign them correctly below
+#     params = {
+#         "latitude": latitude,
+#         "longitude": longitude,
+#         "start_date": date1,
+#         "end_date": date1,
+#         "hourly": "temperature_2m"
+#     }
+#     response = openmeteo.weather_api(url, params=params)
+
+#     if response:
+#         responses = response[0]  # The first response corresponds to the location
+#         hourly = responses.Hourly()
+#         hourly_temperature_2m = hourly.Variables(0).ValuesAsNumpy()
+
+#         times = hourly.Time()  # This will give a list of time in seconds
+#         times = pd.to_datetime(times, unit='s', utc=True)
+
+#         # Combine the data into a dataframe or a heatmap
+#         weather_dataframe = pd.DataFrame({
+#             "time": times,
+#             "temperature": hourly_temperature_2m
+#         })
+    
+#     # Extract the temperature data
+#         print(weather_dataframe)  # You can process or store this data as needed
+        
+#         return weather_dataframe
+#     else:
+#         print("No weather data found.")
+
+from datetime import date
+
+def heatmap_holiday(request):
+    with driver.session() as session:
+        heatmap = session.run("""
+           MATCH (t:Transaction)
+           WHERE (
+            (date(t.Datetime).month = 12 AND date(t.Datetime).day = 23) OR // Day before Christmas Eve
+            (date(t.Datetime).month = 12 AND date(t.Datetime).day = 24) OR // Christmas Eve
+            (date(t.Datetime).month = 12 AND date(t.Datetime).day = 25) OR // Christmas Day
+            (date(t.Datetime).month = 12 AND date(t.Datetime).day = 26) OR // Boxing Day
+            (date(t.Datetime).month = 12 AND date(t.Datetime).day = 30) OR // Day before New Year's Eve
+            (date(t.Datetime).month = 12 AND date(t.Datetime).day = 31) OR // New Year's Eve (kept in the query)
+            (date(t.Datetime).month = 1 AND date(t.Datetime).day = 1) OR // New Year's Day
+            (date(t.Datetime).month = 3 AND date(t.Datetime).day = 28) OR // Day before Good Friday
+            (date(t.Datetime).month = 3 AND date(t.Datetime).day = 29) OR // Good Friday
+            (date(t.Datetime).month = 3 AND date(t.Datetime).day = 30) OR // Easter Saturday
+            (date(t.Datetime).month = 3 AND date(t.Datetime).day = 31) OR // Easter Sunday
+            (date(t.Datetime).month = 4 AND date(t.Datetime).day = 1) OR // Easter Monday
+            (date(t.Datetime).month = 2 AND date(t.Datetime).day = 13) OR // Day before Valentine's Day
+            (date(t.Datetime).month = 2 AND date(t.Datetime).day = 14) OR // Valentine's Day
+            (date(t.Datetime).month = 3 AND date(t.Datetime).day = 9) OR // Day before Mother's Day (UK, 2024)
+            (date(t.Datetime).month = 3 AND date(t.Datetime).day = 10) OR // Mother's Day (UK, 2024)
+            (date(t.Datetime).month = 6 AND date(t.Datetime).day = 15) OR // Day before Father's Day
+            (date(t.Datetime).month = 6 AND date(t.Datetime).day = 16) OR // Father's Day
+            (date(t.Datetime).month = 10 AND date(t.Datetime).day = 30) OR // Day before Halloween
+            (date(t.Datetime).month = 10 AND date(t.Datetime).day = 31) OR // Halloween
+            (date(t.Datetime).month = 11 AND date(t.Datetime).day = 1)    // Day after Halloween
+        )
+        WITH date(t.Datetime) AS datetime, t.Total AS total_sales
+        RETURN datetime AS date, 
+            SUM(total_sales) AS total_sales
+        ORDER BY date(datetime);
+            """)
+        
+        dates = []
+        sales = []
+        
+        for record in heatmap:
+            dates.append(record['date'])
+            sales.append(record['total_sales'])
+
+    return dates, sales
+
+
+def plot_holiday_heatmap():
+    # Get sales data from Neo4j
+    dates, sales = heatmap_holiday(None)
+
+    # Define holiday dates and names (now includes Mother's Day & Halloween)
+    holiday_data = [
+        # ("12-24", "Christmas Eve"), 
+        ("12-25", "Christmas Day"), 
+        # ("12-26", "Boxing Day"),
+        ("01-01", "New Year's Day"),
+        ("03-29", "Good Friday"),("03-31", "Easter Sunday"),
+        ("02-14", "Valentine's Day"), ("03-10", "Mother's Day"), ("06-16", "Father's Day"),
+        ("10-31", "Halloween")
+    ]
+
+    # Initialize a 2D matrix (rows: holidays, cols: Day -1, 0, +1)
+    sales_matrix = np.zeros((len(holiday_data), 3))
+
+    # Map sales data to the matrix
+    for i, date_obj in enumerate(dates):
+        py_date = date(date_obj.year, date_obj.month, date_obj.day)
+        date_str = f"{py_date.month:02d}-{py_date.day:02d}"
+
+        for j, (holiday_date, holiday_name) in enumerate(holiday_data):
+            holiday_dt = date(py_date.year, int(holiday_date.split("-")[0]), int(holiday_date.split("-")[1]))
+
+            if py_date == holiday_dt:  # Holiday itself (Day 0)
+                sales_matrix[j, 1] = sales[i]
+            elif py_date == holiday_dt - timedelta(days=1):  # Day -1
+                sales_matrix[j, 0] = sales[i]
+            elif py_date == holiday_dt + timedelta(days=1):  # Day +1
+                sales_matrix[j, 2] = sales[i]
+
+    print("Sales Matrix:\n", sales_matrix)
+
+    # Generate heatmap
+    plt.figure(figsize=(12, 8))
+    sns.heatmap(sales_matrix, annot=True, fmt=".0f", cmap='YlGnBu',
+                xticklabels=['Day -1', 'Day 0', 'Day +1'], yticklabels=[name for _, name in holiday_data])
+
+    plt.xlabel("Days Relative to Holiday")
+    plt.ylabel("Holiday")
+    plt.title("Sales Around Holidays (Before, During, After)")
+
+    # Save and return filepath
+    filepath = "static/data_files/holiday_heatmap.png"
+    plt.savefig(filepath)
+    plt.close()
+    
+    return filepath
+
+
+def classify_heatmap(sales_matrix):
+    labels = []
+    for row in sales_matrix:
+        before, during, after = row  # Extract Day -1, 0, +1
+        if during > before or after > before:
+            labels.append(1)  # Increased sales
+        else:
+            labels.append(0)  # No increase
+    return np.array(labels)
+
+#make a heatmap for each neighbourhood for total sales 
+
+
+    
+@login_required(login_url="/login/")
 def upload(request):
     return render(request,'uploadcsv.html')
+@login_required(login_url="/login/")
 def reports(request):
     return render(request,'reports.html')
 
