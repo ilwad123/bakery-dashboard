@@ -51,7 +51,8 @@ class CNN_LSTM(nn.Module):
         self.fc = nn.Linear(lstm_hidden_size + 64, 7) 
 
     def forward(self, heatmap, sales_seq):
-        # why put the heatmap here ? 
+        # cnn input (heatmap) and ltsm input is the sales data
+        #cnn processes heatmap 
         x = self.relu(self.conv1(heatmap))
         x = self.maxpool(x)
         x = self.dropout(x)
@@ -66,9 +67,11 @@ class CNN_LSTM(nn.Module):
 
         x = self.global_pool(x).view(x.size(0), -1)
 
+        #ltsm processes the sales data here 
         lstm_out, _ = self.lstm(sales_seq.unsqueeze(-1))
         lstm_out = lstm_out[:, -1, :].view(lstm_out.size(0), -1)
 
+        # combined LTSM and CNN
         combined = torch.cat((x, lstm_out), dim=1)
         output = self.fc(combined)
         return torch.relu(output)
@@ -77,6 +80,7 @@ class CNN_LSTM(nn.Module):
 paths = ["sales_heatmap.png", "monthly_sales.png", "holiday_heatmap.png"]
 
 def load_heatmap(paths):
+    # resized the heatmaps and grayscaled them 
     heatmaps = [cv2.imread(p, cv2.IMREAD_GRAYSCALE) for p in paths]
     heatmaps = [cv2.resize(h, (32, 32)).astype(np.float32) for h in heatmaps]
     heatmaps = [(h - np.mean(h)) / (np.std(h) + 1e-8) for h in heatmaps]
@@ -86,7 +90,7 @@ def load_heatmap(paths):
 X_heatmap = load_heatmap(paths)
 
 # Model
-model = CNN_LSTM(num_channels=3, lstm_hidden_size=100)  # Increase LSTM size (show the difference in the graphs)
+model = CNN_LSTM(num_channels=3, lstm_hidden_size=50)  # Increase LSTM size (show the difference in the graphs)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)  # Reduce learning rate 
 criterion = nn.MSELoss()
 
