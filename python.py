@@ -5,7 +5,7 @@ data = "sales.csv"
 df = pd.read_csv(data)
 
 #replace the missing place name with the store location being dongmyeon
-df['place'].fillna('Toegye-dong', inplace=True)
+df['place'].fillna('Dongmyeon', inplace=True)
 
 translator = GoogleTranslator(source='ko', target='en')
 
