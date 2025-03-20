@@ -7,6 +7,8 @@ import torch.optim as optim
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_absolute_percentage_error
+from sklearn.metrics import mean_absolute_percentage_error
+
 
 # used the csv file for testing 
 # use the graph queries after to us the data and what not 
@@ -85,8 +87,12 @@ X_heatmap = load_heatmap(paths)
 
 # Model
 model = CNN_LSTM(num_channels=3, lstm_hidden_size=100)  # Increase LSTM size (show the difference in the graphs)
-optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)  # Reduce learning rate (also reason why?)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)  # Reduce learning rate 
 criterion = nn.MSELoss()
+
+# Define WMAPE function
+def wmape(actual, predicted):
+    return 100 * np.sum(np.abs(actual - predicted)) / np.sum(actual)
 
 for epoch in range(250):  
     model.train()
@@ -114,11 +120,15 @@ for epoch in range(250):
         train_mape = mean_absolute_percentage_error(train_actual, y_pred_train.flatten()) * 100
         val_mape = mean_absolute_percentage_error(val_actual, y_pred_test.flatten()) * 100
 
+        train_wmape = wmape(train_actual, y_pred_train.flatten())
+        val_wmape = wmape(val_actual, y_pred_test.flatten())
 
-    # Print RMSE every 10 epochs
         print(f"Epoch {epoch+1}: Train RMSE {train_rmse:.4f}, Validation RMSE {val_rmse:.4f}")
         print(f"Train MAPE: {train_mape:.2f}%, Validation MAPE: {val_mape:.2f}%")
-print("Training Completed") 
+        print(f"Train WMAPE: {train_wmape:.2f}%, Validation WMAPE: {val_wmape:.2f}%")
+        
+print("Training Completed")  
+
             
 # Predict Sales on Validation Set
 predicted_val_sales = model(X_heatmap, val_sales).detach().numpy()
