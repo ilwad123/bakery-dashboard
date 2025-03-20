@@ -1,130 +1,56 @@
-# import torch
-# import torch.nn as nn
-# import cv2
-# import numpy as np
-# import torch.optim as optim
-
-# #predict sales revenue 
-# #predict most popular product list => then from there just group to most popular category 
-# # do prediction for route optimisation 
-
-# #check the website if you are on the right track 
-
-# # on monday go through each step of the CNN model and understand it breathe in and out (research about it)
-# #make multiple weather heatmaps for it 
-# # neighbourhood one ask about it ??? so all i have to do is two more heatmaps
-# # then implement it as you go along
-
-# # Define the CNN Model 
-# class SimpleCNN(nn.Module):
-#     def __init__(self, num_channels=3):  # Now expects 3 heatmaps
-#         super(SimpleCNN, self).__init__()
-
-#         self.conv1 = nn.Conv2d(in_channels=num_channels, out_channels=16, kernel_size=3, stride=1, padding=1)
-#         self.conv2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1)
-
-#         self.relu = nn.ReLU()
-#         self.maxpool = nn.MaxPool2d(kernel_size=2, stride=2)
-
-#         self.global_pool = nn.AdaptiveAvgPool2d(1)  # Adaptive pooling to remove fixed size dependency
-#         self.fc = nn.Linear(32, 7)  # Output 7 prediction sales for the coming 7 days 
-#         # self.fc=nn.Linear(32,30/31 depending on the month ) #output prediction of sales for the coming month
-
-#     def forward(self, x):
-#         x = self.relu(self.conv1(x))
-#         x = self.maxpool(x)
-
-#         x = self.relu(self.conv2(x))
-#         x = self.maxpool(x)
-
-#         x = self.global_pool(x).squeeze()
-#         x = self.fc(x)  
-#         x = torch.relu(x) 
-#         return x
-
-# # Function to Load Heatmaps as Separate Channels
-# def load_heatmap(paths):
-#     heatmaps = [cv2.imread(p, cv2.IMREAD_GRAYSCALE) for p in paths]  
-#     heatmaps = [cv2.resize(h, (32, 32)).astype(np.float32) for h in heatmaps]  
-    
-#     # Normalize: mean = 0, std = 1
-#     heatmaps = [(h - np.mean(h)) / (np.std(h) + 1e-8) for h in heatmaps]  
-    
-#     heatmaps = np.stack(heatmaps, axis=0)  
-#     return torch.tensor(heatmaps, dtype=torch.float32).unsqueeze(0)  
-
-
-# # 3️⃣ Define Input Paths (Now using 3 heatmaps)
-# paths = ["sales_heatmap.png", "monthly_sales.png", "holiday_heatmap.png"]  # Only 3 images
-
-# # 4️⃣ Load Heatmap Data
-# X = load_heatmap(paths)  # Shape: (1, 3, 32, 32) -> (Batch, Channels, Height, Width)
-
-# # 5️⃣ Initialize Model AFTER Data is Loaded
-# model = SimpleCNN(num_channels=3)  # Now expecting 3 channels
-
-# # 6️⃣ Predict Sales
-# output = model(X)
-
-# print("Predicted Sales:", output)  # This prints the entire tensor of 7 values
-
-# #Why Training Matters
-# # Right now, your CNN has no idea what sales mean—it just processes numbers.
-# #Training teaches it to find relationships between heatmaps and actual sales.
-# #Once trained, your CNN will predict realistic sales values instead of random ones.
-
-# model = SimpleCNN(num_channels=3)  # This is correct, you're initializing the model
-# optimizer = torch.optim.Adam(model.parameters(), lr=0.001)  # Adam optimizer
-# criterion = nn.CrossEntropyLoss()
-
-# for epoch in range(2):  # loop over the dataset multiple times
-
-#     running_loss = 0.0
-#     for i, data in enumerate(trainloader, 0):
-#         # get the inputs; data is a list of [inputs, labels]
-#         inputs, labels = data
-
-#         # zero the parameter gradients
-#         optimizer.zero_grad()
-
-#         # forward + backward + optimize
-#         outputs = net(inputs)
-#         loss = criterion(outputs, labels)
-#         loss.backward()
-#         optimizer.step()
-
-#         # print statistics
-#         running_loss += loss.item()
-#         if i % 2000 == 1999:    # print every 2000 mini-batches
-#             print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 2000:.3f}')
-#             running_loss = 0.0
-
-# print('Finished Training')
-
+import pandas as pd
 import torch
 import torch.nn as nn
 import cv2
 import numpy as np
 import torch.optim as optim
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import mean_absolute_percentage_error
 
-class SimpleCNN(nn.Module):
-    def __init__(self, num_channels=3):  
-        super(SimpleCNN, self).__init__()
+# used the csv file for testing 
+# use the graph queries after to us the data and what not 
+file_path = "sales_modified5.csv"  
+df = pd.read_csv(file_path)
 
-        self.conv1 = nn.Conv2d(num_channels, 16, kernel_size=3, stride=1, padding=1)  
-        self.conv2 = nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1)  
-        self.conv3 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)  
+df['datetime'] = pd.to_datetime(df['datetime'])
+df['date'] = df['datetime'].dt.date
+
+# calculate the total sales per day 
+daily_sales = df.groupby('date')['total'].sum().reset_index()
+daily_sales.columns = ['Date', 'Total Sales']
+
+# Normalise sales data
+scaler = MinMaxScaler()
+daily_sales['Total Sales'] = scaler.fit_transform(daily_sales[['Total Sales']])  # Double brackets make it 2D
+
+
+# Split data into training and validation sets based on 80/20 
+#convert to a tensor
+split_idx = int(len(daily_sales) * 0.8)
+train_sales = torch.tensor(daily_sales['Total Sales'].values[:split_idx], dtype=torch.float32).unsqueeze(0)
+val_sales = torch.tensor(daily_sales['Total Sales'].values[split_idx:], dtype=torch.float32).unsqueeze(0)
+
+# Define CNN + LSTM Model
+class CNN_LSTM(nn.Module):
+    def __init__(self, num_channels=3, lstm_hidden_size=50):
+        super(CNN_LSTM, self).__init__()
+
+        self.conv1 = nn.Conv2d(num_channels, 16, kernel_size=3, stride=1, padding=1)
+        self.conv2 = nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1)
+        self.conv3 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
 
         self.relu = nn.ReLU()
         self.maxpool = nn.MaxPool2d(kernel_size=2, stride=2)
         self.dropout = nn.Dropout(p=0.5)
 
-        self.global_pool = nn.AdaptiveAvgPool2d(1)  
-        self.fc = nn.Linear(64, 7)  
+        self.global_pool = nn.AdaptiveAvgPool2d(1)
+        self.lstm = nn.LSTM(input_size=1, hidden_size=lstm_hidden_size, num_layers=2, batch_first=True)
+        self.fc = nn.Linear(lstm_hidden_size + 64, 7) 
 
-    def forward(self, x):
-        x = self.relu(self.conv1(x))
+    def forward(self, heatmap, sales_seq):
+        # why put the heatmap here ? 
+        x = self.relu(self.conv1(heatmap))
         x = self.maxpool(x)
         x = self.dropout(x)
 
@@ -136,78 +62,101 @@ class SimpleCNN(nn.Module):
         x = self.maxpool(x)
         x = self.dropout(x)
 
-        x = self.global_pool(x).squeeze()
-        x = self.fc(x)
-        x = torch.relu(x)  
-        return x
+        x = self.global_pool(x).view(x.size(0), -1)
 
+        lstm_out, _ = self.lstm(sales_seq.unsqueeze(-1))
+        lstm_out = lstm_out[:, -1, :].view(lstm_out.size(0), -1)
 
-# Function to Load Heatmaps as Separate Channels
-def load_heatmap(paths):
-    heatmaps = [cv2.imread(p, cv2.IMREAD_GRAYSCALE) for p in paths]  
-    heatmaps = [cv2.resize(h, (32, 32)).astype(np.float32) for h in heatmaps]  
+        combined = torch.cat((x, lstm_out), dim=1)
+        output = self.fc(combined)
+        return torch.relu(output)
 
-    # Normalize: mean = 0, std = 1
-    heatmaps = [(h - np.mean(h)) / (np.std(h) + 1e-8) for h in heatmaps]  
-
-    heatmaps = np.stack(heatmaps, axis=0)  
-    return torch.tensor(heatmaps, dtype=torch.float32).unsqueeze(0)  # Shape: (1, 3, 32, 32)
-
-
+# Load heatmaps
 paths = ["sales_heatmap.png", "monthly_sales.png", "holiday_heatmap.png"]
 
-X = load_heatmap(paths)  
-#past 7 day sales 
-Y = torch.tensor([[250.4,246.6, 0, 118.1, 134.1, 215.7, 92.7]], dtype=torch.float32)  
+def load_heatmap(paths):
+    heatmaps = [cv2.imread(p, cv2.IMREAD_GRAYSCALE) for p in paths]
+    heatmaps = [cv2.resize(h, (32, 32)).astype(np.float32) for h in heatmaps]
+    heatmaps = [(h - np.mean(h)) / (np.std(h) + 1e-8) for h in heatmaps]
+    heatmaps = np.stack(heatmaps, axis=0)
+    return torch.tensor(heatmaps, dtype=torch.float32).unsqueeze(0)
 
-# Normalise Y to a similar scale as input heatmaps (0 to 1)
-Y_min, Y_max = Y.min(), Y.max()
-Y = (Y - Y_min) / (Y_max - Y_min)
+X_heatmap = load_heatmap(paths)
 
-model = SimpleCNN(num_channels=3)
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+# Model
+model = CNN_LSTM(num_channels=3, lstm_hidden_size=100)  # Increase LSTM size (show the difference in the graphs)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)  # Reduce learning rate (also reason why?)
 criterion = nn.MSELoss()
 
-scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.5)
-
-#training loop
 for epoch in range(250):  
-    optimizer.zero_grad()  # Reset gradients
+    model.train()
+    optimizer.zero_grad()
 
-    outputs = model(X)  # Forward pass
-    loss = criterion(outputs, Y)  # Compute loss
-    loss.backward()  # Backpropagation
-    optimizer.step()  # Update weights
-    
-    # Step the learning rate scheduler
-    scheduler.step()
+    # Forward pass
+    outputs = model(X_heatmap, train_sales)  
+    loss = criterion(outputs, train_sales[:, -7:])  
+    loss.backward()
+    optimizer.step()
+    print(f"Epoch [{epoch+1}/250] completed.,Loss: {loss.item():.4f}")
 
-    if epoch % 10 == 0:  # Print loss every 10 epochs
-        print(f'Epoch [{epoch+1}/250], Loss: {loss.item():.4f}')
+    # Evaluation (after training step)
+    model.eval()
+    with torch.no_grad():
+        y_pred_train = model(X_heatmap, train_sales).detach().numpy()
+        y_pred_test = model(X_heatmap, val_sales).detach().numpy()
 
-print('Finished Training')
-print("Labels (True Sales):", Y)
+        train_actual = train_sales[:, -7:].numpy().flatten()
+        val_actual = val_sales[:, -7:].numpy().flatten()
 
-
-# prints the predicted model
-predictions = outputs.detach().numpy()
-predictions_rescaled = predictions * (Y_max.item() - Y_min.item()) + Y_min.item()
-print("Predicted Sales for Next 7 Days:", predictions_rescaled)
-
-predictions_tensor = torch.tensor(predictions, dtype=torch.float32)
-
-mae = torch.mean(torch.abs(predictions_tensor - Y))  # Mean Absolute Error
-print(f'MAE: {mae.item()}')
-mse = torch.mean((predictions_tensor - Y) ** 2)
-print(f'MSE: {mse.item()}')
+        train_rmse = np.sqrt(criterion(torch.tensor(y_pred_train), torch.tensor(train_actual))).item()
+        val_rmse = np.sqrt(criterion(torch.tensor(y_pred_test), torch.tensor(val_actual))).item()
+        
+        train_mape = mean_absolute_percentage_error(train_actual, y_pred_train.flatten()) * 100
+        val_mape = mean_absolute_percentage_error(val_actual, y_pred_test.flatten()) * 100
 
 
-#graph of predicted sales vs true sales 
+    # Print RMSE every 10 epochs
+        print(f"Epoch {epoch+1}: Train RMSE {train_rmse:.4f}, Validation RMSE {val_rmse:.4f}")
+        print(f"Train MAPE: {train_mape:.2f}%, Validation MAPE: {val_mape:.2f}%")
+print("Training Completed") 
+            
+# Predict Sales on Validation Set
+predicted_val_sales = model(X_heatmap, val_sales).detach().numpy()
+predicted_val_sales_rescaled= scaler.inverse_transform(predicted_val_sales)
+actual_val_sales_rescaled = scaler.inverse_transform(val_sales.numpy().reshape(-1, 1)).flatten()
 
-plt.plot(predictions.flatten(), label='Predicted Sales')
-plt.plot(Y.flatten(), label='True Sales', linestyle='dashed')
+# Predict Future Sales (Next 7 Days)
+future_sales_input = val_sales[:, -7:].clone()  # Take last 7 days of validation data as input
+predicted_future_sales = model(X_heatmap, future_sales_input).detach().numpy()
+#reverse normalised form to get the future sales
+predicted_future_sales_rescaled = scaler.inverse_transform(predicted_future_sales)
+
+# Print predicted future sales
+print("Predicted Sales for Next 7 Days:", predicted_future_sales_rescaled.flatten())
+
+# Plot predictions
+plt.plot(predicted_val_sales_rescaled.flatten(), label='Predicted Sales')
+plt.plot(actual_val_sales_rescaled.flatten(), label='Actual Sales', linestyle='dashed')
 plt.legend()
-plt.title('Predicted vs True Sales')
+plt.title('Predicted vs Actual Sales (Validation Set)')
 plt.xlabel('Day')
 plt.ylabel('Sales')
 plt.show()
+
+# Plot future sales predictions (useful for the chart.js )
+plt.figure()
+plt.plot(predicted_future_sales_rescaled.flatten(), label='Predicted Future Sales', color='red')
+plt.legend()
+plt.title('Predicted Sales for Next 7 Days')
+plt.xlabel('Day')
+plt.ylabel('Sales')
+plt.show()
+
+# the code should show the next days specifically
+# ask if you think the sales prediction should show hourly 
+# maybe I could add this to further works section? 
+# ask about should the machine learning algorithm run only once per day 
+#then run to get the other days (talk about this in the session on how it would be done to show the graph)
+
+# explain research about the metrics to evaluate the model 
+
