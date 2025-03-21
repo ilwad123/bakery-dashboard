@@ -173,4 +173,6 @@ plt.show()
 #then run to get the other days (talk about this in the session on how it would be done to show the graph)
 
 # explain research about the metrics to evaluate the model 
+# Creating performance.csv file and driver.csv file ask if the steps and algorithms should be screenshoted in report
+# same goes for the data cleaning bit and graph queries?
 
