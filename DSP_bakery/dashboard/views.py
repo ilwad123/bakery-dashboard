@@ -436,10 +436,7 @@ def classify_heatmap(sales_matrix):
             labels.append(0)  # No increase
     return np.array(labels)
 
-#make a heatmap for each neighbourhood for total sales 
 
-
-    
 @login_required(login_url="/login/")
 def upload(request):
     return render(request,'uploadcsv.html')
