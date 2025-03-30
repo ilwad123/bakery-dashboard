@@ -90,6 +90,13 @@ def home(request):
 
     return response
 
+# @login_required(login_url="/login/")
+# def predicted_sales_view(request):
+#     predicted_sales = get_predicted_sales()  # This returns a list of 7 values
+#     context = {
+#         'predicted_sales': predicted_sales
+#     }
+#     return render(request, 'predicted_sales.html', context)
 
 class CaptchaTestForm(forms.Form):
     captcha = CaptchaField() 

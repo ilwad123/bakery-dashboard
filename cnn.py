@@ -90,20 +90,22 @@ def load_heatmap(paths):
 X_heatmap = load_heatmap(paths)
 
 # Model
-model = CNN_LSTM(num_channels=3, lstm_hidden_size=50)  # Increase LSTM size (show the difference in the graphs)
-optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)  # Reduce learning rate 
+model = CNN_LSTM(num_channels=3, lstm_hidden_size=120)  # Increase LSTM size (show the difference in the graphs)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)  # Reduce learning rate 
 criterion = nn.MSELoss()
 
 # Define WMAPE function
 def wmape(actual, predicted):
     return 100 * np.sum(np.abs(actual - predicted)) / np.sum(actual)
 
+
 for epoch in range(250):  
     model.train()
     optimizer.zero_grad()
-
+    
     # Forward pass
     outputs = model(X_heatmap, train_sales)  
+    print("Output shape:", outputs.shape)
     loss = criterion(outputs, train_sales[:, -7:])  
     loss.backward()
     optimizer.step()
@@ -118,9 +120,15 @@ for epoch in range(250):
         train_actual = train_sales[:, -7:].numpy().flatten()
         val_actual = val_sales[:, -7:].numpy().flatten()
 
-        train_rmse = np.sqrt(criterion(torch.tensor(y_pred_train), torch.tensor(train_actual))).item()
-        val_rmse = np.sqrt(criterion(torch.tensor(y_pred_test), torch.tensor(val_actual))).item()
-        
+        train_pred_tensor = torch.tensor(y_pred_train, dtype=torch.float32)
+        val_pred_tensor = torch.tensor(y_pred_test, dtype=torch.float32)
+
+        train_actual_tensor = torch.tensor(train_actual, dtype=torch.float32).view(1, -1)
+        val_actual_tensor = torch.tensor(val_actual, dtype=torch.float32).view(1, -1)
+
+        train_rmse = np.sqrt(criterion(train_pred_tensor, train_actual_tensor)).item()
+        val_rmse = np.sqrt(criterion(val_pred_tensor, val_actual_tensor)).item()
+
         train_mape = mean_absolute_percentage_error(train_actual, y_pred_train.flatten()) * 100
         val_mape = mean_absolute_percentage_error(val_actual, y_pred_test.flatten()) * 100
 
@@ -131,9 +139,10 @@ for epoch in range(250):
         print(f"Train MAPE: {train_mape:.2f}%, Validation MAPE: {val_mape:.2f}%")
         print(f"Train WMAPE: {train_wmape:.2f}%, Validation WMAPE: {val_wmape:.2f}%")
         
+
+
 print("Training Completed")  
 
-            
 # Predict Sales on Validation Set
 predicted_val_sales = model(X_heatmap, val_sales).detach().numpy()
 predicted_val_sales_rescaled= scaler.inverse_transform(predicted_val_sales)
@@ -149,6 +158,7 @@ predicted_future_sales_rescaled = scaler.inverse_transform(predicted_future_sale
 print("Predicted Sales for Next 7 Days:", predicted_future_sales_rescaled.flatten())
 
 # Plot predictions
+plt.axvline(x=7, color='red', linestyle='dotted', label='Forecast Horizon')  # Optional: Adjust based on actual prediction days
 plt.plot(predicted_val_sales_rescaled.flatten(), label='Predicted Sales')
 plt.plot(actual_val_sales_rescaled.flatten(), label='Actual Sales', linestyle='dashed')
 plt.legend()

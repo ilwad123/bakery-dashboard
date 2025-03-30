@@ -58,6 +58,3 @@ print(delivery_counts)
 df.to_csv('sales_modified5.csv', index=False)
 # Calculate delivery counts for each driver
 data.to_csv('driver.csv', index=False)
-
-#add avgdeliverytime to this ? 
-#how would you know this tho ?? leave it for now discuss with Elias 

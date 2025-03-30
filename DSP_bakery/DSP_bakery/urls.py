@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from django.urls import path
-from . import views
+from dashboard import views 
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -27,6 +27,6 @@ urlpatterns = [
     path('reports/', views.reports, name='reports'),
     path('captcha/', include('captcha.urls')),  # Captcha URL
     path('logout/', views.logout_view, name='logout'),  # Logout view
+    # path('predicted-sales/', views.predicted_sales_view, name='predicted_sales'),
 ]
-
 
