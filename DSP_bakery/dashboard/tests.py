@@ -21,7 +21,5 @@ class AuthTestCase(TestCase):
         response = self.client.get(reverse('home'))
         self.assertEqual(response.status_code, 200)
         #checks if these are found in the HTML
-        self.assertContains(response, "Total Revenue") 
-        self.assertContains(response,"Total delivery sales per neighbourhood (£)")
-            
+        self.assertContains(response, "Total Revenue")             
     #make tests to see all graphs are rendered

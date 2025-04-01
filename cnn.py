@@ -33,6 +33,14 @@ split_idx = int(len(daily_sales) * 0.8)
 train_sales = torch.tensor(daily_sales['Total Sales'].values[:split_idx], dtype=torch.float32).unsqueeze(0)
 val_sales = torch.tensor(daily_sales['Total Sales'].values[split_idx:], dtype=torch.float32).unsqueeze(0)
 
+# Split data into training, validation, and test sets based on 70/15/15
+train_size = int(len(daily_sales) * 0.7)
+val_size = int(len(daily_sales) * 0.15)
+test_size = len(daily_sales) - train_size - val_size
+
+train_sales = torch.tensor(daily_sales['Total Sales'].values[:train_size], dtype=torch.float32).unsqueeze(0)
+val_sales = torch.tensor(daily_sales['Total Sales'].values[train_size:train_size + val_size], dtype=torch.float32).unsqueeze(0)
+test_sales = torch.tensor(daily_sales['Total Sales'].values[train_size + val_size:], dtype=torch.float32).unsqueeze(0)
 # Define CNN + LSTM Model
 class CNN_LSTM(nn.Module):
     def __init__(self, num_channels=3, lstm_hidden_size=50):
@@ -91,7 +99,7 @@ X_heatmap = load_heatmap(paths)
 
 # Model
 model = CNN_LSTM(num_channels=3, lstm_hidden_size=120)  # Increase LSTM size (show the difference in the graphs)
-optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)  # Reduce learning rate 
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0003)  # Reduce learning rate 
 criterion = nn.MSELoss()
 
 # Define WMAPE function
@@ -99,7 +107,8 @@ def wmape(actual, predicted):
     return 100 * np.sum(np.abs(actual - predicted)) / np.sum(actual)
 
 
-for epoch in range(250):  
+for epoch in range(1000):  
+    # Training step
     model.train()
     optimizer.zero_grad()
     
@@ -114,6 +123,7 @@ for epoch in range(250):
     # Evaluation (after training step)
     model.eval()
     with torch.no_grad():
+        
         y_pred_train = model(X_heatmap, train_sales).detach().numpy()
         y_pred_test = model(X_heatmap, val_sales).detach().numpy()
 
@@ -143,22 +153,28 @@ for epoch in range(250):
 
 print("Training Completed")  
 
+
+# 📊 Test Set Evaluation
+with torch.no_grad():
+    y_pred_test = model(X_heatmap, test_sales).detach().numpy()
+    test_actual = test_sales[:, -7:].numpy().flatten()
+
+    test_rmse = np.sqrt(criterion(torch.tensor(y_pred_test), torch.tensor(test_actual).view(1, -1))).item()
+    test_mape = mean_absolute_percentage_error(test_actual, y_pred_test.flatten()) * 100
+    test_wmape = wmape(test_actual, y_pred_test.flatten())
+
+    print(f"🧪 Test RMSE: {test_rmse:.4f}")
+    print(f"🧪 Test MAPE: {test_mape:.2f}%")
+    print(f"🧪 Test WMAPE: {test_wmape:.2f}%")
+
+
 # Predict Sales on Validation Set
 predicted_val_sales = model(X_heatmap, val_sales).detach().numpy()
 predicted_val_sales_rescaled= scaler.inverse_transform(predicted_val_sales)
 actual_val_sales_rescaled = scaler.inverse_transform(val_sales.numpy().reshape(-1, 1)).flatten()
 
-# Predict Future Sales (Next 7 Days)
-future_sales_input = val_sales[:, -7:].clone()  # Take last 7 days of validation data as input
-predicted_future_sales = model(X_heatmap, future_sales_input).detach().numpy()
-#reverse normalised form to get the future sales
-predicted_future_sales_rescaled = scaler.inverse_transform(predicted_future_sales)
-
-# Print predicted future sales
-print("Predicted Sales for Next 7 Days:", predicted_future_sales_rescaled.flatten())
-
-# Plot predictions
-plt.axvline(x=7, color='red', linestyle='dotted', label='Forecast Horizon')  # Optional: Adjust based on actual prediction days
+#plot validation predictions
+plt.axvline(x=7, color='red', linestyle='dotted', label='Forecast Horizon')  
 plt.plot(predicted_val_sales_rescaled.flatten(), label='Predicted Sales')
 plt.plot(actual_val_sales_rescaled.flatten(), label='Actual Sales', linestyle='dashed')
 plt.legend()
@@ -167,14 +183,41 @@ plt.xlabel('Day')
 plt.ylabel('Sales')
 plt.show()
 
-# Plot future sales predictions (useful for the chart.js )
+# Plot test predictions
+predicted_test_rescaled = scaler.inverse_transform(y_pred_test)
+actual_test_rescaled = scaler.inverse_transform(test_sales.numpy().reshape(-1, 1)).flatten()
+
 plt.figure()
-plt.plot(predicted_future_sales_rescaled.flatten(), label='Predicted Future Sales', color='red')
+plt.plot(predicted_test_rescaled.flatten(), label='Predicted Test Sales')
+plt.plot(actual_test_rescaled.flatten(), label='Actual Test Sales', linestyle='dashed')
+plt.title('Test Set: Predicted vs Actual Sales')
 plt.legend()
-plt.title('Predicted Sales for Next 7 Days')
 plt.xlabel('Day')
 plt.ylabel('Sales')
 plt.show()
+
+# Predict Future Sales (Next 7 Days)
+future_sales_input = test_sales[:, -7:].clone()
+predicted_future_sales = model(X_heatmap, future_sales_input).detach().numpy()
+predicted_future_sales_rescaled = scaler.inverse_transform(predicted_future_sales)
+
+# Plot future sales predictions
+plt.figure()
+plt.axvline(x=0, color='red', linestyle='dotted', label='Forecast Start')
+plt.plot(predicted_future_sales_rescaled.flatten(), label='Predicted Future Sales', color='red')
+plt.title('Predicted Sales for Next 7 Days')
+plt.xlabel('Day')
+plt.ylabel('Sales')
+plt.legend()
+plt.show()
+
+
+# Print predicted future sales
+print("Predicted Sales for Next 7 Days:", predicted_future_sales_rescaled.flatten())
+
+# old code for validation set 
+#changed so can use the test set to see how it sees unseen data
+
 
 # the code should show the next days specifically
 # ask if you think the sales prediction should show hourly 
