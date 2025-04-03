@@ -27,6 +27,6 @@ urlpatterns = [
     path('reports/', views.reports, name='reports'),
     path('captcha/', include('captcha.urls')),  # Captcha URL
     path('logout/', views.logout_view, name='logout'),  # Logout view
-    # path('predicted-sales/', views.predicted_sales_view, name='predicted_sales'),
+    path('predicted-sales/', views.predict_sales_page, name='predicted-sales'),
 ]
 

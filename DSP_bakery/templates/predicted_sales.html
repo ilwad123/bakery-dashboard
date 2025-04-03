@@ -1,18 +1,55 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Predicted Sales</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="{% static 'css/predicted_sales.css' %}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 </head>
 <body>
+    <div class="sidebar">
+        <ul>
+            <br><br><br>
+            <li><a href="{% url 'home' %}"><i class="material-icons">dashboard</i> Dashboard</a></li>
+            <li><a href="{% url 'predicted-sales' %}"><i class="material-icons">insert_chart</i> Predictions</a></li>
+            {% comment %} <li><a href="#Delivery Driver Info"><i class="material-icons">information</i> Delivery Driver Info</a></li> {% endcomment %}
+            <li><a href="uploadcsv.html"><i class="material-icons">table_chart</i>Sales History</a></li>
+            <li><a href="{% url 'reports' %}"><i class="material-icons">report</i>Report</a></li>
+            {% if user.is_authenticated %}
+            <li><a href="{% url 'logout' %}"><i class="material-icons">logout</i> Logout</a></li>
+        {% else %}
+            <li><a href="{% url 'login' %}"><i class="material-icons">login</i> Login</a></li>
+        {% endif %}
+        </ul>
+    </div>
     <h2>Predicted Sales for the Next 7 Days</h2>
     <canvas id="predictionChart" width="600" height="300"></canvas>
 
     <script>
-        var predictedSales = {{ predicted_sales|safe }};
-        var labels = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"];
+        const predictedSales = JSON.parse('{{ predicted_sales|safe|escapejs }}');
+        const labels = JSON.parse('{{ dates|safe|escapejs }}');
 
-        var ctx = document.getElementById('predictionChart').getContext('2d');
+        let sum = 0;
+
+        // calculate total predicted sales in for loop
+        predictedSales.forEach( total_predicted_sales => {
+        sum += total_predicted_sales;
+        })
+        // get the current weeks total sales from the database
+        //compare the percentage of the current weeks sales to the predicted sales for the week
+        // if the current weeks sales are 20% less than the predicted sales, then display a warning message  
+
+        // projected sales for the week display in a card
+        console.log("Total Predicted Sales:", sum);
+        console.log("Predicted:", predictedSales);
+        console.log("Labels:", labels);
+
+        const ctx = document.getElementById('predictionChart').getContext('2d');
         new Chart(ctx, {
             type: 'line',
             data: {
@@ -20,15 +57,21 @@
                 datasets: [{
                     label: 'Predicted Sales',
                     data: predictedSales,
-                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
                     fill: false,
-                    tension: 0.2
+                    tension: 0.3
                 }]
             },
             options: {
                 responsive: true,
                 plugins: {
                     legend: { display: true }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
         });

@@ -33,6 +33,12 @@ import pandas as pd
 from retry_requests import retry
 from datetime import date, timedelta
 
+from .cnn_model import predict_from_graph_data
+import pandas as pd
+import datetime
+from datetime import datetime
+
+
 # Set up logging
 
 matplotlib.use('Agg')
@@ -40,6 +46,68 @@ matplotlib.use('Agg')
 
 driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USERNAME, settings.NEO4J_PASSWORD))
 
+from neo4j.time import DateTime as Neo4jDateTime
+
+from .cnn_model import predict_from_graph_data
+import pandas as pd
+from datetime import datetime
+from datetime import date, timedelta
+
+def get_previous_weeks_per_total(request):
+    # gets the sales data from graph database of the last 7 days 
+    #just return each days total sales
+    #don't use native just return the date as a string
+    with driver.session() as session:
+        result = session.run("""
+            MATCH (t:Transaction)
+            WHERE date(t.Datetime) >= date() - duration({ days: 7 })
+            WITH date(t.Datetime) AS day, SUM(t.Total) AS total
+            RETURN day, total
+            ORDER BY day DESC
+        """)
+        previous_week_sales = []
+        for record in result:
+            previous_week_sales = record["total"]
+
+        return json.dump(previous_week_sales)
+    
+        
+def sales_data_CNNLTSM():
+    with driver.session() as session:
+        result = session.run("""
+            MATCH (t:Transaction)
+            WITH date(t.Datetime) AS day, SUM(t.Total) AS total
+            RETURN day, total
+            ORDER BY day
+        """)
+        records = []
+        for record in result:
+            records.append({
+                "date": record["day"].to_native(),
+                "total": record["total"]
+            })
+        return pd.DataFrame(records)
+
+
+def predict_sales_page(request):
+    # gets the sales data from graph database 
+    df = sales_data_CNNLTSM()
+    #get the results from the algorithm in cnn_model.py
+    predicted_sales = predict_from_graph_data(df)
+    dates=[]
+    # Loop through the next 7 days and append to the dates list
+    for i in range(7):
+        #would use this for present however the data i have is static 
+        # dates.append((date.today() + timedelta(days=i)).isoformat())        
+        last_date = df['date'].max()
+        dates.append((last_date + timedelta(days=i+1)).isoformat())
+
+    return render(request, 'predicted_sales.html', {
+        'predicted_sales': json.dumps(predicted_sales.tolist()),  # Convert to JSON
+        'dates': json.dumps(dates)
+    })
+
+    
 @login_required(login_url="/login/")
 def home(request):
     months, sales = line_graph(request)
