@@ -28,9 +28,10 @@
         </ul>
     </div>
     <h2>Predicted Sales for the Next 7 Days</h2>
-    <canvas id="predictionChart" width="600" height="300"></canvas>
-
-    <script>
+    <div class="chart-container">
+        <canvas id="predictionChart"></canvas>
+    </div>
+        <script>
         const predictedSales = JSON.parse('{{ predicted_sales|safe|escapejs }}');
         const labels = JSON.parse('{{ dates|safe|escapejs }}');
 
