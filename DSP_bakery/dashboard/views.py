@@ -53,23 +53,32 @@ import pandas as pd
 from datetime import datetime
 from datetime import date, timedelta
 
-def get_previous_weeks_per_total(request):
-    # gets the sales data from graph database of the last 7 days 
-    #just return each days total sales
-    #don't use native just return the date as a string
-    with driver.session() as session:
-        result = session.run("""
-            MATCH (t:Transaction)
-            WHERE date(t.Datetime) >= date() - duration({ days: 7 })
-            WITH date(t.Datetime) AS day, SUM(t.Total) AS total
-            RETURN day, total
-            ORDER BY day DESC
-        """)
-        previous_week_sales = []
-        for record in result:
-            previous_week_sales = record["total"]
+from django.shortcuts import render
+import json
 
-        return json.dump(previous_week_sales)
+# def get_previous_weeks_per_total(request):
+#     with driver.session() as session:
+#         result = session.run("""
+#             MATCH (t:Transaction)
+#             WHERE date(t.Datetime) >= date() - duration({ days: 7 })
+#             WITH date(t.Datetime) AS day, SUM(t.Total) AS total
+#             RETURN day, total
+#             ORDER BY day DESC
+#         """)
+#         previous_week_sales = []
+
+#         for record in result:
+#             previous_week_sales.append({
+#                 "day": str(record["day"]),    # Convert Neo4j Date to string
+#                 "total": record["total"]
+#             })
+            
+
+#         return render(request, 'predicted_sales.html', {
+#             'previous_week_sales': json.dumps(previous_week_sales),
+#             # 👈 Pass it as a JSON string
+#         })
+
     
         
 def sales_data_CNNLTSM():
@@ -90,6 +99,20 @@ def sales_data_CNNLTSM():
 
 
 def predict_sales_page(request):
+    with driver.session() as session:
+        result = session.run("""
+            MATCH (t:Transaction)
+            WHERE datetime(t.Datetime) >= datetime() - duration({ days: 7 })
+            WITH date(datetime(t.Datetime)) AS day, SUM(t.Total) AS total
+            RETURN day, total
+            ORDER BY day DESC
+
+        """)
+        previous_week_sales = [
+            {"day": (record["day"]).native(), "total": record["total"]}
+            for record in result
+        ]
+
     # gets the sales data from graph database 
     df = sales_data_CNNLTSM()
     #get the results from the algorithm in cnn_model.py
@@ -104,7 +127,9 @@ def predict_sales_page(request):
 
     return render(request, 'predicted_sales.html', {
         'predicted_sales': json.dumps(predicted_sales.tolist()),  # Convert to JSON
-        'dates': json.dumps(dates)
+        'dates': json.dumps(dates),
+        'previous_week_sales': json.dumps(previous_week_sales)
+
     })
 
     
@@ -239,7 +264,63 @@ def heatmap(request):
 
         return day_of_week, time_of_day, total_sales
  
+def performance_each_driver(request):
+    with driver.session() as session:
+        result = session.run("""
+           MATCH (p:Performance)
+           RETURN p.Driver_id AS driver_id,
+                  p.performance_id AS performance_id,
+                  p.total_sales AS total_sales,
+                  p.total_distance AS total_distance
+        """)
+        driver_id = []
+        performance_id = []
+        total_sales=[]
+        total_distance=[]
+        sales_per_km=[]
+        for record in result:
+            driver_id.append(record["driver_id"])
+            performance_id.append(record["performance_id"])
+            total_sales.append(record["total_sales"])
+            total_distance.append(record["total_distance"])
+            sales_per_km.append(round(record["total_sales"] / record["total_distance"], 2))
+        print(driver_id)  
+        print(performance_id)
+        print(total_sales)
+        print(total_distance)
+        print(sales_per_km)
+    return driver_id, performance_id, total_sales, total_distance, sales_per_km
+def total_sales_from_the_last_quarter(request):
+    with driver.session() as session:
+        result = session.run("""
+            MATCH (t:Transaction)
+            WHERE datetime(t.Datetime) >= datetime() - duration({ months: 3 })
+            RETURN SUM(t.Total) AS total_sales
+        """)
 
+        record = result.single()
+        quarter_sales = record["total_sales"] if record and record["total_sales"] is not None else 0.0
+        print("Total sales from the last quarter:", quarter_sales)
+
+    return quarter_sales
+
+
+def performance_page(request):
+    driver_id, performance_id, total_sales, total_distance, sales_per_km = performance_each_driver(request)
+    quarter_sales = total_sales_from_the_last_quarter(request)
+
+    context = {
+        'driver_id': json.dumps(driver_id),
+        'sales_per_km': json.dumps(sales_per_km),
+        'performance_id': json.dumps(performance_id),
+        'total_sales': json.dumps(total_sales),
+        'total_distance': json.dumps(total_distance),
+        'quarter_sales': json.dumps(quarter_sales),
+        # 'timestamp': int(datetime.now().timestamp())
+        #COULD ADD THIS AT THE TOP OF THE PAGE TO SHOW IT HAS BEEN UPDATED
+    }   
+
+    return render(request, 'performance.html', context)
 def plot_heatmap():
     # Assuming the heatmap function returns day_of_week, time_of_day, and total_sales
     day_of_week, time_of_day, total_sales = heatmap(None)

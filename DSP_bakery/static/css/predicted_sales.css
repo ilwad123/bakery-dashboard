@@ -113,19 +113,61 @@ p{
     box-shadow: 0 6px 12px rgba(108, 36, 76, 0.8);
     background-color: white;
     border-radius: 16px;
+    padding: 11px;
+    margin-left: 40vh;
+    margin-right: auto;
+    text-align: left;
+    width: 30%;
+    min-width: 150px;
+    height: 20vh;
+    font-family: 'Poppins', sans-serif;
+    margin-top: 20px;
+}
+
+
+p{
+    font-family: poppins, sans-serif;
+    text-align:center;
+    /* font-weight: 600;
+    /* margin-left: 40vh;
+    margin-top: 70px; */
+}
+
+
+.sum {
+    font-family: poppins, sans-serif;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.7rem;
+    margin-right: 20px;
+    margin-top: 15px;
+}
+
+.card2 {
+    box-shadow: 0 6px 12px rgba(108, 36, 76, 0.8);
+    background-color: white;
+    border-radius: 16px;
     padding: 15px;
-    margin-top: 30px;
-    margin-left: auto;   
-    margin-right: auto; 
+    margin-top: 23px;
+    margin-left: 40vh;
+    margin-right: auto;
     text-align: left;
     width: 60%;
-    min-width: 300px;
-    height: 58vh;
+    min-width: 900px;
+    height: 45vh;
     font-family: 'Poppins', sans-serif;
 }
-.chart-container {
-    margin-left: 55vh;
-    margin-top: 20px;
-    min-width: 750px;
-    min-height: 300px;
+.download_pdf{
+    background-color: rgb(19, 108, 216);
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 40vh;
+    margin-bottom: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    text-align: center;
 }

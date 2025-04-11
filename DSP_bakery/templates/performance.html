@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+{% load static%}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Performance</title>
+    <link href="{% static 'css/performance.css' %}" rel="stylesheet">
+    <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-doughnutlabel"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+    <div class="sidebar">
+        <ul>
+            <br><br><br>
+            <li><a href="{% url 'home' %}"><i class="material-icons">dashboard</i> Dashboard</a></li>
+            <li><a href="{% url 'predicted-sales' %}"><i class="material-icons">insert_chart</i> Predictions</a></li>
+            {% comment %} <li><a href="#Delivery Driver Info"><i class="material-icons">information</i> Delivery Driver Info</a></li> {% endcomment %}
+            <li><a href="uploadcsv.html"><i class="material-icons">table_chart</i>Sales History</a></li>
+            <li><a href="{% url 'reports' %}"><i class="material-icons">report</i>Report</a></li>
+            {% if user.is_authenticated %}
+            <li><a href="{% url 'logout' %}"><i class="material-icons">logout</i> Logout</a></li>
+        {% else %}
+            <li><a href="{% url 'login' %}"><i class="material-icons">login</i> Login</a></li>
+        {% endif %}
+        </ul>
+    </div>
+    <div class="main-content">
+        <div class="chart-wrapper">
+            <canvas id="salesPerKmChart" width="600" height="400"></canvas>
+        </div>
+          <div class="card1">
+            <span id="quarter_sales" class="quarter_sales"></span>
+        </div>
+          <script>
+        const driverLabels = JSON.parse('{{ driver_id|safe|escapejs }}');
+        const salesPerKmData = JSON.parse('{{ sales_per_km|safe|escapejs }}');
+        const quarter_sales=JSON.parse('{{ quarter_sales|safe|escapejs }}');
+        document.getElementById('quarter_sales').textContent = '£' + quarter_sales.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+        
+        const ctx = document.getElementById('salesPerKmChart').getContext('2d');
+        const salesPerKmChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: driverLabels,
+                label: 'Driver ID',
+                datasets: [{
+                    label: 'Sales per KM',
+                    data: salesPerKmData,
+                    borderWidth: 1,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                }]
+            },
+            options: {
+                responsive: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Sales per Kilometer by Driver',
+                        font: {
+                            size: 18
+                        }
+                    },
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Sales per KM'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Driver ID'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+ 
+        
+
+        {% comment %} write code to make a performance graph {% endcomment %}

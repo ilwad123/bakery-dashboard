@@ -27,55 +27,75 @@
         {% endif %}
         </ul>
     </div>
-    <h2>Predicted Sales for the Next 7 Days</h2>
-    <div class="chart-container">
-        <canvas id="predictionChart"></canvas>
+    <div class="card">
+        <h2>Projected Revenue</h2>
+        <p class="sum"><span id="sum"></span><span id="arrow1"></span></p>
     </div>
+    <div class ="card2">
+    <canvas id="predictionChart" height="600"width="1900"></canvas>
+    </div>
+    <button class="download_pdf">Download PDF</button>
         <script>
-        const predictedSales = JSON.parse('{{ predicted_sales|safe|escapejs }}');
-        const labels = JSON.parse('{{ dates|safe|escapejs }}');
+            const predictedSales = JSON.parse('{{ predicted_sales|safe|escapejs }}');
+            const labels = JSON.parse('{{ dates|safe|escapejs }}');
+            const previousWeekSales = JSON.parse('{{ previous_week_sales|safe|escapejs }}');
+        
+            let sum = 0;
+        
+            // calculate total predicted sales in for loop
+            predictedSales.forEach(total_predicted_sales => {
+                sum += total_predicted_sales;
+            });
+            console.log("Previous Week Sales in JS:", previousWeekSales);
+            //CALCULATE THE PERCENTAGE CHANGE OF THE RRENT WEEKS SALES TO THE PREDICTED SALES FOR THE WEEK
+            {% comment %} const percentageChange = ((total_predicted_sales - previousWeekSales) / previousWeekSales) * 100; {% endcomment %}
+            
+            {% comment %} console.log(`Percentage change: ${percentageChange.toFixed(2)}%`);  {% endcomment %}
 
-        let sum = 0;
+            // get the current weeks total sales from the database
+            //compare the percentage of the current weeks sales to the predicted sales for the week
+            // if the current weeks sales are 20% less than the predicted sales, then display a warning message  
 
-        // calculate total predicted sales in for loop
-        predictedSales.forEach( total_predicted_sales => {
-        sum += total_predicted_sales;
-        })
-        // get the current weeks total sales from the database
-        //compare the percentage of the current weeks sales to the predicted sales for the week
-        // if the current weeks sales are 20% less than the predicted sales, then display a warning message  
+            document.addEventListener('DOMContentLoaded', () => {
+                // update the projected total sales on the page
+                document.getElementById("sum").textContent = sum.toLocaleString("en-UK", {
+                    style: "currency",
+                    currency: "GBP",
+                    minimumFractionDigits: 2
+                });
+            });
+            
+            // projected sales for the week display in a card
+            console.log("Total Predicted Sales:", sum);
+            console.log("Predicted:", predictedSales);
+            console.log("Labels:", labels);
 
-        // projected sales for the week display in a card
-        console.log("Total Predicted Sales:", sum);
-        console.log("Predicted:", predictedSales);
-        console.log("Labels:", labels);
-
-        const ctx = document.getElementById('predictionChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Predicted Sales',
-                    data: predictedSales,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 2,
-                    fill: false,
-                    tension: 0.3
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: true }
+            const ctx = document.getElementById('predictionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Predicted Sales',
+                        data: predictedSales,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.3
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
                     }
                 }
-            }
-        });
+            });
     </script>
 </body>
 </html>

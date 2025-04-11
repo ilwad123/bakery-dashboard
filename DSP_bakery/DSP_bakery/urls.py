@@ -28,5 +28,7 @@ urlpatterns = [
     path('captcha/', include('captcha.urls')),  # Captcha URL
     path('logout/', views.logout_view, name='logout'),  # Logout view
     path('predicted-sales/', views.predict_sales_page, name='predicted-sales'),
+    path('performance/', views.performance_page, name='performance') # Performance page
+    # path('download_pdf/', views.download_pdf, name='download_pdf'),  # Download PDF view
 ]
 
