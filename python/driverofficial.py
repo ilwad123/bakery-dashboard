@@ -21,7 +21,8 @@ date = df.groupby(df['datetime'].dt.date)
 for date1, day_transactions in date:
     # Select 3 random drivers for the day
     driver_pool = np.random.choice(driver_id, driver_per_day, replace=False)
-    assigned = {driver: None for driver in driver_pool}  # Initialize driver availability
+    assigned = {driver: None for driver in driver_pool} 
+    # Initialise driver availability
 
     # Process each transaction
     for index, row in day_transactions.iterrows():
