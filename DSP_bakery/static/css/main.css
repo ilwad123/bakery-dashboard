@@ -7,7 +7,7 @@ main{
     display: flex;
     flex-wrap: wrap;
     height: 100vh;
-    width: 100vh;
+    width: 100%;
     align-items: center;
     margin: 0;
 }
@@ -117,22 +117,26 @@ p{
     margin-top: 30px;
     margin-left: 70px;
     text-align: left;
-    width: 60%; 
-    min-width: 300px;
-    height: 58vh;
+    width: 100%;  
+    max-width: 600px;  
+    min-width: 300px;  
+    height: auto;  
     font-family: 'Poppins', sans-serif;
 }
-.card1{
+
+.card1 {
     box-shadow: 0 6px 12px rgba(108, 36, 76, 0.8); 
-    background-color:white;
+    background-color: white;
     border-radius: 16px; 
-    padding:15px;
-    margin-top:30px;
-    margin-left:30px; 
+    padding: 15px;
+    margin-top: 30px;
+    margin-left: 30px; 
     text-align: left;
-    width: 60%; 
-    min-width:400px;
-    font-family: 'Poppins', sans-serif; 
+    width: 100%; 
+    max-width: 600px; 
+    min-width: 300px;  
+    height: auto;
+    font-family: 'Poppins', sans-serif;
 }
 .card2 li{
     text-decoration:none;
@@ -155,10 +159,7 @@ p{
     margin-top:30px;
 }
 
-/* add a gap between card3 and card4 */
-.card3 + .card4 {
-    margin-left: 20px;
-}
+
 .card4{
     box-shadow: 0 6px 12px rgba(108, 36, 76, 0.8);
     background-color: white;
@@ -173,6 +174,7 @@ p{
     height:61vh;
     float:inline-start;
 }
+
 
 .card5 {
     border: 2px solid #ddd;
@@ -198,6 +200,7 @@ p{
     margin-top:-370px;
     float:inline-start;
 }
+
 .card5 table {
     width: 100%;
     border-collapse: collapse;
@@ -216,7 +219,7 @@ p{
 }
 
 .pagination1 {
-    margin-top: auto; /* Push the pagination to the bottom of the card */
+    margin-top: auto;
     text-align: center; 
     flex-wrap: wrap;
 
@@ -405,12 +408,12 @@ box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .line-graph {
-    position: absolute;  /* Allows positioning inside the card */
-    bottom: 30%;         /* Place it slightly above the bottom of the card */
-    right: 5%;            /* Aligns it closer to the left edge */
-    width: 40%;          /* Adjusts size relative to the card */
-    height: auto;        /* Maintains aspect ratio */
-    opacity: 0.5;        /* Subtle white effect */
+    position: absolute;  
+    bottom: 30%;         
+    right: 5%;           
+    width: 40%;          
+    height: auto;        
+    opacity: 0.5;        
 }
 .line-graph polyline {
     stroke: rgba(255, 255, 255, 0.7); /* Transparent white stroke */
@@ -456,9 +459,6 @@ box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.1);
     font-family: 'Courier New', Courier, monospace;
 }
 
-/* .arrow{
-    font-size: 10px;
-} */
 
 .area
 {
@@ -499,19 +499,17 @@ fieldset{
 }
 
 /* Default styles for the topbar */
+/* Topbar Styling */
 .topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #6C244C;
-    padding: 10px 20px;
-    color: white;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 10000; /* Higher than the sidebar */
     position: fixed;
     top: 0;
+    left: 0;
     width: 100%;
-    z-index: 1000;
+    background-color: #6C244C;
+    padding: 10px 20px;
 }
+
 
 .hamburger {
     background: none;
@@ -530,12 +528,14 @@ fieldset{
 
 .mobile-menu {
     display: none; /* Hidden by default */
-    flex-direction: column;
-    background-color: white;
     position: absolute;
-    top: 60px; /* Below the topbar */
+    top: 60px;  /* To position it below the topbar */
+    left: 0;
     width: 100%;
+    height: 100%; /* Full height to cover the screen */
+    background-color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 9999; /* Ensure the mobile menu is on top */
 }
 
 .mobile-menu ul {
@@ -571,112 +571,96 @@ fieldset{
     display: flex; /* Show the mobile menu when toggled */
 }
 
-/* Mobile view (max-width: 600px) */
-@media screen and (max-width: 600px) {
-    /* Hide sidebar on small screens */
-    .sidebar {
-        display: none;
+
+/* Mobile view adjustments */
+@media screen and (max-width: 900px) {
+    /* Stack colored cards vertically */
+    .summary, .summary2, .summary3, .summary4 {
+        width: 60%;  /* Full width for mobile view */
+        /* margin-right: 50px; Remove negative margin */
+        margin-right: 80px;
+        margin:0;
+        justify-content: center;
+        align-items: center ;
     }
 
-    /* Ensure topbar is displayed */
+
+        /* Adjust the cards to align left in mobile */
+        .card, .card1, .card2, .card3, .card4, .card5 {
+            margin-left: 0; /* Remove left margin */
+            margin-right: 0; /* Reset margin-right */
+            width: 100%;  /* Full width */
+            max-width: none; /* Allow full width for all cards */
+            margin-top: 15px; /* Space between cards */
+        
+        }
+    
+        /* Adjust card width for mobile */
+        .card, .card1, .card2, .card3, .card4, .card5 {
+            width: 80%;  /* Full width */
+            margin-right:-30px; /* Center the cards with some left margin */
+            margin-bottom:20px;
+        }
+
     .topbar {
         display: flex;
     }
 
-    /* Show hamburger menu */
-    .hamburger {
-        display: block;
-    }
-
-    /* Adjust layout for small screens */
-    body {
-        flex-direction: column;
-    }
-
-    /* Adjust card width */
-    .card, .card1, .card2 {
-        margin-left: 0;
-        margin-right: 0;
-        width: 90%;
-    }
-
-    /* Sidebar links on mobile: hide text, show icons only */
-    .sidebar a {
-        display: flex;
-        justify-content: left;
-        align-items: center;
-        font-size: 0; /* Hide text labels */
-    }
-
-    .sidebar a i {
-        font-size: 1.5rem; /* Icon size */
-    }
-
-    /* Flexbox layout for the container */
-    .container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 20px;
-    }
-
-    /* Adjust card width for mobile */
-    .card {
-        width: 50%;
-        min-width: 200px;
-    }
-}
-
-/* Tablet devices (max-width: 900px) */
-@media screen and (max-width: 900px) {
-    /* Sidebar width for tablet */
     .sidebar {
-        width: 15vh;
+       display:none;
     }
 
-    /* Adjust card width for tablets */
-    .card, .card1, {
-        width: 80%;
-    }
-    .card3 {
-        width: 30%;
+
+    #map {
+        width: 100%; /* Full width for the map */
+        height: 300px; /* Keep map height constant */
+        margin-top: 15px; /* Space from the charts */
     }
 
-    /* Sidebar links adjustments for tablet */
-    .sidebar a {
-        display: flex;
-        justify-content: left;
-        align-items: center;
-        font-size: 0;
-    }
-
-    .sidebar a i {
-        font-size: 1.5rem;
+    .sidebar {
+        width: 250px; /* Default width */
+        position: fixed;
+        left: -250px; /* Start off-screen */
+        transition: left 0.3s ease;
     }
     
-}
-
-/* Larger devices (desktop, min-width: 1200px) */
-@media screen and (min-width: 1200px) {
-    /* Sidebar width for desktop */
-    .sidebar {
-        width: 25vh;
+    /* Sidebar active state */
+    .sidebar.active {
+        left: 0; /* Move to visible position */
     }
-    .topbar {
-        display: none;
-    }
-}
-
-/* Ensure mobile menu is hidden on larger screens */
-@media screen and (min-width: 601px) {
+    
+    /* Mobile menu styles */
     .mobile-menu {
-        display: none;
+        display: none; /* Hidden by default */
     }
+    
+    /* Active mobile menu */
+    .mobile-menu.active {
+        display: block; /* Show mobile menu when toggled */
+    }
+    /* Container to align everything in a column */
+    .container {
+        display: block; /* Stack items vertically */
+        width: 100%; /* Full width */
+    }
+    
+    /* For pagination */
+    .pagination1 {
+        display: block; /* Stack pagination */
+        width: 100%; /* Full width */
+        text-align: center; /* Center the pagination */
+    }
+    
+    /* Adjust for individual cards */
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+@media screen and (min-width: 900px) {
     .topbar {
-        display: none;
-    }
-    .hamburger {
         display: none; 
     }
 }

@@ -30,7 +30,8 @@
            </a></li>
 
            <li><a href="uploadcsv.html"><i class="material-icons">table_chart</i>Sales History</a></li>
-   
+           <li><a href="{% url 'performance' %}"><i class="material-icons">Performance</i>Performance</a></li>
+
            <li><a href="{% url 'reports' %}"><i class="material-icons">report</i>Report</a></li>
    
            {% if user.is_authenticated %}

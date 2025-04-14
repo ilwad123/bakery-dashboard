@@ -69,25 +69,104 @@ ul{
     width: 100vh;
 }
 
+/* Flexbox container for charts */
+.chart-container {
+    display: flex;
+    justify-content: space-between; 
+    gap: 5px;
+    margin-top: 25px;
+    margin-left: 110px;
+}
+
 .chart-wrapper {
+    flex: 1; 
+    max-width: 600px; 
+    margin-top: 25px;
+    margin-left:140px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(108, 36, 76, 0.8);   
+    padding: 15px;
+}
+
+
+.card2{
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 40px;
-    margin-left:300px;
-  }
+    margin-top: 25px;
+    margin-left:50px;
+    box-shadow: 0 6px 12px rgba(108, 36, 76, 0.8);   
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+}
+.quarter_sales{
+    font-size: 25px;
+}
+.percent_change{
+    font-size:18px;
+}
+
+
+.card-container {
+    display: flex;
+    justify-content: space-between;  /* Distribute space between cards */
+    gap: 20px;  
+    margin-top: 25px;
+    margin-left: 8px;
+}
+
   
 .card1{
     margin-top: 20px;
-    margin-left: 300px;
+    margin-left: 250px;
     width: 400px;
-    height: 200px;
+    height: 100px;
     background-color: #f8f9fa;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    padding: 20px;
+    box-shadow: 0 6px 12px rgba(108, 36, 76, 0.8);   
+    padding: 15px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.card4{
+    margin-top: 20px;  
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    margin-right:110px;
+    box-shadow: 0 6px 12px rgba(108, 36, 76, 0.8);  
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;  
+    display: inline-flex;
+    }
+.card4 h2{
+    margin-top:5px;
+}
+
+.card4 .inline-content {
+    display: inline-flex;  
+    align-items: center;  }
+
+.card4 .inline-content span {
+    margin-right: 5px; 
+}
+
+.card4 .inline-content p {
+    margin: 0;  
+}
+.card_top-driver{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* margin-right:90px; */
+    box-shadow: 0 6px 12px rgba(108, 36, 76, 0.8);   
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
 }

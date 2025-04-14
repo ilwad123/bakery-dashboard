@@ -56,29 +56,53 @@ from datetime import date, timedelta
 from django.shortcuts import render
 import json
 
-# def get_previous_weeks_per_total(request):
-#     with driver.session() as session:
-#         result = session.run("""
-#             MATCH (t:Transaction)
-#             WHERE date(t.Datetime) >= date() - duration({ days: 7 })
-#             WITH date(t.Datetime) AS day, SUM(t.Total) AS total
-#             RETURN day, total
-#             ORDER BY day DESC
-#         """)
-#         previous_week_sales = []
+import base64
+from io import BytesIO
+from django.http import JsonResponse
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from django.views.decorators.csrf import csrf_exempt
+from PIL import Image
+from io import BytesIO
+import io
 
-#         for record in result:
-#             previous_week_sales.append({
-#                 "day": str(record["day"]),    # Convert Neo4j Date to string
-#                 "total": record["total"]
-#             })
-            
+@csrf_exempt
+def generate_pdf(request):
+    if request.method == 'POST':
+        # Get JSON data from the request
+        data = json.loads(request.body)
+        chart_image_data = data['chart_ima  ge']
+        revenue = data['revenue']
+        
+        # Decode the base64 image
+        chart_image_data = chart_image_data.split(",")[1]  # Remove the prefix part of base64
+        chart_image = base64.b64decode(chart_image_data)
 
-#         return render(request, 'predicted_sales.html', {
-#             'previous_week_sales': json.dumps(previous_week_sales),
-#             # 👈 Pass it as a JSON string
-#         })
+        # Create a temporary image file
+        image = Image.open(BytesIO(chart_image))
+        image_path = '/tmp/chart_image.png'
+        image.save(image_path)
 
+        # Create a response to return a PDF
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="sales_report.pdf"'
+
+        # Create the PDF using ReportLab
+        p = canvas.Canvas(response, pagesize=letter)
+
+        # Add the revenue text
+        p.drawString(100, 750, f"Projected Revenue: {revenue}")
+
+        # Add the chart image
+        p.drawImage(image_path, 100, 500, width=400, height=200)
+
+        # Save the PDF
+        p.showPage()
+        p.save()
+
+        return response
+    return JsonResponse({'error': 'Invalid method'}, status=405)
     
         
 def sales_data_CNNLTSM():
@@ -263,7 +287,42 @@ def heatmap(request):
                 total_sales.append(sales)
 
         return day_of_week, time_of_day, total_sales
- 
+    
+def driver_info(request):
+    with driver.session() as session:
+        result = session.run("""
+            MATCH (d:Driver)
+            RETURN d.Driver_id AS driver_id,
+                   d.total_deliveries AS total_deliveries,
+                   d.avgDelivTime AS avgDelivTime
+        """)
+
+        driver_id = []
+        total_deliveries = []
+        avgDelivTime = []
+
+        # Iterate through the result and process each record
+        for record in result:
+            driver_id.append(record["driver_id"])
+            total_deliveries.append(record["total_deliveries"])
+
+            # Check if avgDelivTime exists and is not None
+            if record["avgDelivTime"] is not None:
+                # Extract hour, minute, and second from the Neo4j time object
+                time_obj = record["avgDelivTime"]
+                normal_time = f"{time_obj.hour:02}:{time_obj.minute:02}:{time_obj.second:02}"
+            else:
+                normal_time = "00:00:00"  # Default value if there's no time data
+
+            avgDelivTime.append(normal_time)
+
+        # Debug print to check the data
+        print(driver_id)
+        print(total_deliveries)
+        print(avgDelivTime)
+
+    return driver_id, total_deliveries, avgDelivTime
+
 def performance_each_driver(request):
     with driver.session() as session:
         result = session.run("""
@@ -290,25 +349,61 @@ def performance_each_driver(request):
         print(total_distance)
         print(sales_per_km)
     return driver_id, performance_id, total_sales, total_distance, sales_per_km
+
 def total_sales_from_the_last_quarter(request):
     with driver.session() as session:
         result = session.run("""
+            // Matches the transaction node
             MATCH (t:Transaction)
-            WHERE datetime(t.Datetime) >= datetime() - duration({ months: 3 })
-            RETURN SUM(t.Total) AS total_sales
+            // Converts the datetime so it can be readable 
+            //sums the total sales for the last 3 months
+            WITH datetime({ year: t.Datetime.year, month: t.Datetime.month, day: 1 }) AS month, 
+                 SUM(t.Total) AS monthly_sales
+            RETURN month, monthly_sales
+            ORDER BY month DESC
+            LIMIT 3
         """)
 
-        record = result.single()
-        quarter_sales = record["total_sales"] if record and record["total_sales"] is not None else 0.0
-        print("Total sales from the last quarter:", quarter_sales)
+        #initialise the variable to store the sales
+        quarter_sales = 0.0
+        # Loop through the result and sum the monthly sales
+        for record in result:
+            sales = record["monthly_sales"]
+            if sales is not None:
+                quarter_sales += sales
 
+        print("Quarter sales (sum of last 3 months):", quarter_sales)
     return quarter_sales
 
+def previous_quarter_sales(request):
+    with driver.session() as session:
+        result = session.run("""
+            MATCH (t:Transaction)
+            WITH datetime({ year: t.Datetime.year, month: t.Datetime.month, day: 1 }) AS month, 
+                 SUM(t.Total) AS monthly_sales
+            RETURN month, monthly_sales
+            ORDER BY month DESC
+            SKIP 3
+            LIMIT 3
+        """)
+
+        #initialise the variable to store the sales
+        previous_quarter_sales1 = 0.0
+        # Loop through the result and sum the monthly sales
+        for record in result:
+            sales = record["monthly_sales"]
+            if sales is not None:
+                previous_quarter_sales1 += sales
+
+        print("Quarter sales (previous_quarter):", previous_quarter_sales1)
+    return previous_quarter_sales1
 
 def performance_page(request):
     driver_id, performance_id, total_sales, total_distance, sales_per_km = performance_each_driver(request)
     quarter_sales = total_sales_from_the_last_quarter(request)
-
+    # Get the driver info
+    driver_id, total_deliveries, avgDelivTime = driver_info(request)
+    previous_quarter_sales1 = previous_quarter_sales(request)
     context = {
         'driver_id': json.dumps(driver_id),
         'sales_per_km': json.dumps(sales_per_km),
@@ -316,6 +411,9 @@ def performance_page(request):
         'total_sales': json.dumps(total_sales),
         'total_distance': json.dumps(total_distance),
         'quarter_sales': json.dumps(quarter_sales),
+        'total_deliveries': json.dumps(total_deliveries),
+        'avgDelivTime': json.dumps(avgDelivTime),
+        'previous_quarter_sales': json.dumps(previous_quarter_sales1),
         # 'timestamp': int(datetime.now().timestamp())
         #COULD ADD THIS AT THE TOP OF THE PAGE TO SHOW IT HAS BEEN UPDATED
     }   
