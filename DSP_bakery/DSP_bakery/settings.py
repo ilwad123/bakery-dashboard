@@ -39,7 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'captcha',
+    'dashboard',
+    'django_cron',
 ]
+
+CRON_CLASSES = [
+    "dashboard.cron.TestCronJob",
+]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

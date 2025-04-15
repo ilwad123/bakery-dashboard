@@ -86,7 +86,11 @@ def predict_from_graph_data(df):
     val_sales = torch.tensor(daily_sales['Total'].values[train_size:train_size + val_size], dtype=torch.float32).unsqueeze(0)
     test_sales = torch.tensor(daily_sales['Total'].values[train_size + val_size:], dtype=torch.float32).unsqueeze(0)
     
-    X_heatmap = load_heatmap(["sales_heatmap.png", "monthly_sales.png", "holiday_heatmap.png"])
+    X_heatmap = load_heatmap([
+    "../static/data_files/sales_heatmap.png",
+    "../static/data_files/monthly_sales.png",
+    "../static/data_files/holiday_heatmap.png"])
+
 
     model = CNN_LSTM(num_channels=3, lstm_hidden_size=120)  # Increase LSTM size (show the difference in the graphs)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)  # Reduce learning rate 

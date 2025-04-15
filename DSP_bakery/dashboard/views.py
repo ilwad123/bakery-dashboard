@@ -137,20 +137,35 @@ def predict_sales_page(request):
             for record in result
         ]
 
-    # gets the sales data from graph database 
-    df = sales_data_CNNLTSM()
-    #get the results from the algorithm in cnn_model.py
-    predicted_sales = predict_from_graph_data(df)
-    dates=[]
-    # Loop through the next 7 days and append to the dates list
-    for i in range(7):
-        #would use this for present however the data i have is static 
-        # dates.append((date.today() + timedelta(days=i)).isoformat())        
-        last_date = df['date'].max()
-        dates.append((last_date + timedelta(days=i+1)).isoformat())
+    # # gets the sales data from graph database 
+    # df = sales_data_CNNLTSM()
+    # #get the results from the algorithm in cnn_model.py
+    # predicted_sales = predict_from_graph_data(df)
+    # dates=[]
+    # # Loop through the next 7 days and append to the dates list
+    # for i in range(7):
+    #     #would use this for present however the data i have is static 
+    #     # dates.append((date.today() + timedelta(days=i)).isoformat())        
+    #     last_date = df['date'].max()
+    #     dates.append((last_date + timedelta(days=i+1)).isoformat())
+    
+    #would get the predicted sales from the cron job
+    file_path = os.path.join(settings.BASE_DIR, "predicted_sales_cron_output.json")
+
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            cron_data = json.load(f)
+        # Extract the predicted sales and dates from the cron output
+        predicted_sales = cron_data["predictions"]
+        dates = cron_data["dates"]
+    except Exception as e:
+        #if not found then set the predicted sales to 0 and the dates to empty
+        predicted_sales = []
+        dates = []
+        print("Failed to load cron output:", e)
 
     return render(request, 'predicted_sales.html', {
-        'predicted_sales': json.dumps(predicted_sales.tolist()),  # Convert to JSON
+        'predicted_sales': json.dumps(predicted_sales),  
         'dates': json.dumps(dates),
         'previous_week_sales': json.dumps(previous_week_sales)
 
