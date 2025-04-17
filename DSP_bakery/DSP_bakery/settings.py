@@ -138,3 +138,10 @@ NEO4J_URI = "bolt://localhost:7687"
 NEO4J_USERNAME = "neo4j"             # Replace with  Neo4j username
 NEO4J_PASSWORD = "12345678"     # Replace with  Neo4j password
 
+import os
+from neo4j import GraphDatabase
+
+uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+user = os.getenv("NEO4J_USER", "neo4j")
+password = os.getenv("NEO4J_PASSWORD", "test")
+driver = GraphDatabase.driver(uri, auth=(user, password))
