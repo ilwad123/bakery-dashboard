@@ -133,7 +133,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
-# settings.py
-NEO4J_URI = "bolt://localhost:7687" 
-NEO4J_USERNAME = "neo4j"             # Replace with  Neo4j username
-NEO4J_PASSWORD = "12345678"     # Replace with  Neo4j password
+# # settings.py
+# NEO4J_URI = "bolt://localhost:7687" 
+# NEO4J_USERNAME = "neo4j"             # Replace with  Neo4j username
+# NEO4J_PASSWORD = "12345678"     # Replace with  Neo4j password
+
+from decouple import config
+
+NEO4J_URI = config("NEO4J_URI", default="bolt://localhost:7687")
+NEO4J_USERNAME = config("NEO4J_USERNAME", default="neo4j")
+NEO4J_PASSWORD = config("NEO4J_PASSWORD", default="12345678")
