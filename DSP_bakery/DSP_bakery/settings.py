@@ -138,11 +138,11 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 # NEO4J_USERNAME = "neo4j"             # Replace with  Neo4j username
 # NEO4J_PASSWORD = "12345678"     # Replace with  Neo4j password
 
-# from decouple import config
+import os
 
-# NEO4J_URI = config("NEO4J_URI", default="bolt://localhost:7687")
-# NEO4J_USERNAME = config("NEO4J_USERNAME", default="neo4j")
-# NEO4J_PASSWORD = config("NEO4J_PASSWORD", default="12345678")
+NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+NEO4J_USERNAME = os.getenv("NEO4J_USERNAME", "neo4j")
+NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "12345678")
 
 from decouple import config
 
