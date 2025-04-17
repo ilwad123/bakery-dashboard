@@ -9,29 +9,30 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # 🔧 Neo4j running in Docker as a service
     services:
       neo4j:
         image: neo4j:5.7
         ports:
           - 7687:7687
         env:
-          NEO4J_AUTH: neo4j/test  # username:password
+          NEO4J_AUTH: neo4j/test  # This sets the login creds
 
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Python
+      - name: 🐍 Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r DSP_bakery/requirements.txt
 
-      - name: Run tests
+      - name: 🧪 Run Django tests with Neo4j
         working-directory: DSP_bakery
         env:
           NEO4J_URI: bolt://localhost:7687
