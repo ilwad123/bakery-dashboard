@@ -23,3 +23,9 @@ class AuthTestCase(TestCase):
         #checks if these are found in the HTML
         # self.assertContains(response, "Total Revenue")             
     #make tests to see all graphs are rendered
+    
+    def test_predict_sales_page(self):
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.get(reverse('predict_sales'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'predicted_sales.html')
