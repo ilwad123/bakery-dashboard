@@ -7,13 +7,13 @@ class AuthTestCase(TestCase):
     def setUp(self):
         #creates a fake user
         self.user = User.objects.create_user(username='testuser', password='testpass123')
-    
+        self.client.login(username='testuser', password='testpass123')  
+
     def test_dashboard_access_with_login(self):
         protected_views = ['home', 'performance', 'predicted-sales']
         templates = ['bakery.html', 'performance.html', 'predicted_sales.html']
         for view_name in protected_views:
             #fake user is logged in 
-            self.client.login(username='testuser', password='testpass123')
             response = self.client.get(reverse(view_name))
             self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(response, templates[protected_views.index(view_name)])
@@ -30,36 +30,20 @@ class AuthTestCase(TestCase):
             self.assertRedirects(response, reverse('login'))
             self.assertTemplateUsed(response, 'login.html')
             self.assertContains(response, 'Please log in to access this page.')
-            #add logout view to the test
-            # self.client.logout()
-            # response = self.client.get(reverse('logout'))
-            # self.assertEqual(response.status_code, 200)
-            # self.assertTemplateUsed(response, 'logout.html')
-            # self.assertContains(response, 'You have been logged out.')
-
-class TestCronJob(TestCase):
-    
-
-    # def test_dashboard_access_with_login(self):
-    #     #fake user is logged in 
-    #     self.client.login(username='testuser', password='testpass123')
+          
+    # def logout_tests(self):
+    #     #tests that the user is logged in and should be redirected to the home page
+    #     response = self.client.get(reverse('logout'))
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertTemplateUsed(response, 'logout.html')
+    #     self.assertContains(response, 'You have been logged out.')
+    #     #check if user is logged out
     #     response = self.client.get(reverse('home'))
-    #     self.assertEqual(response.status_code, 200)
-    #     #checks if these are found in the HTML
-    #     # self.assertContains(response, "Total Revenue")             
-    # #make tests to see all graphs are rendered
+    #     self.assertEqual(response.status_code, 302)
+    #     self.assertIn('/login/', response.url)
+    #     self.assertRedirects(response, reverse('login'))
+    #     self.assertTemplateUsed(response, 'login.html')
+    #     self.assertContains(response, 'Please log in to access this page.')
+
+# class TestCronJob(TestCase):
     
-    # def test_predict_sales_page(self):
-    #     #tests user is logged in should allow us to access the page
-    #     self.client.login(username='testuser', password='testpass123')
-    #     response = self.client.get(reverse('predicted-sales'))
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTemplateUsed(response, 'predicted_sales.html')
-    
-    # def test_performance_page(self):
-    #     #tests user is logged in should allow us to access the page
-    #     self.client.login(username='testuser', password='testpass123')
-    #     response = self.client.get(reverse('performance'))
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTemplateUsed(response, 'performance.html')
-        
