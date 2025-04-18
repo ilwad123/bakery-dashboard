@@ -170,3 +170,59 @@ ul{
     border-radius: 10px;
     padding: 15px;
 }
+
+.dark-toggle {
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin: 10px;
+    transition: background-color 0.3s ease;
+}
+.dark-toggle:hover {
+    background-color: #f0f0f0;
+}
+body.dark-mode .dark-toggle {
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #666;
+}
+body.dark-mode .dark-toggle:hover {
+    background-color: #444;
+}
+
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+body.dark-mode .sidebar {
+    background-color: #1e1e1e;
+}
+
+body.dark-mode .sidebar a {
+    color: #ffffff;
+}
+
+body.dark-mode .sidebar a:hover {
+    background-color: #6C244C;
+    color: #f5f5f5;
+}
+
+body.dark-mode .card1,
+body.dark-mode .card2,
+body.dark-mode .card4,
+body.dark-mode .card_top-driver,
+body.dark-mode .chart-wrapper {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .inline-content p {
+    color: #ffffff;
+}
+

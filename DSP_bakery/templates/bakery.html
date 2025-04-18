@@ -20,6 +20,7 @@
 
 </head>
 
+
 <body>
         <!-- Topbar with Hamburger Menu -->
         <header class="topbar">
@@ -33,10 +34,19 @@
             <ul>
                 <li><a href="{% url 'home' %}"><i class="material-icons">dashboard</i> Dashboard</a></li>
                 <li><a href="{% url 'predicted-sales' %}"><i class="material-icons">insert_chart</i> Predictions</a></li>
+                {% comment %} <li><a href="#Delivery Driver Info"><i class="material-icons">information</i> Delivery Driver Info</a></li> {% endcomment %}
                 <li><a href="uploadcsv.html"><i class="material-icons">table_chart</i>Sales History</a></li>
-                <li><a href="{% url 'performance' %}"><i class="material-icons">report</i>Performance</a></li>
+                <li><a href="{% url 'performance' %}"><i class="material-icons">speed</i>Performance</a></li>
+                <li><a href="{% url 'reports' %}"><i class="material-icons">report</i>Report</a></li>
+                {% if user.is_authenticated %}
+                <li><a href="{% url 'logout' %}"><i class="material-icons">logout</i> Logout</a></li>
+            {% else %}
                 <li><a href="{% url 'login' %}"><i class="material-icons">login</i> Login</a></li>
+            {% endif %}
             </ul>
+            <button onclick="toggleDarkMode()" class="dark-toggle">
+                🌙 Toggle Dark Mode
+              </button>      
         </nav> 
     <div class="sidebar">
         <ul>
@@ -53,6 +63,9 @@
             <li><a href="{% url 'login' %}"><i class="material-icons">login</i> Login</a></li>
         {% endif %}
         </ul>
+        <button onclick="toggleDarkMode()" class="dark-toggle">
+            🌙 Toggle Dark Mode
+          </button>       
     </div>
     <style>
         .pagination {
@@ -395,6 +408,19 @@ function toggleMenu() {
 }
 </script>
 
-
-
-</html>
+<script>
+    function toggleDarkMode() {
+        const isDarkMode = document.body.classList.toggle('dark-mode');
+        localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+    
+        if (lineChart) {
+            lineChart.options.plugins.legend.labels.color = isDarkMode ? 'white' : '#333';
+            lineChart.options.scales.x.ticks.color = isDarkMode ? 'white' : '#333';
+            lineChart.options.scales.y.ticks.color = isDarkMode ? 'white' : '#333';
+            lineChart.options.scales.x.grid.color = isDarkMode ? 'white' : '#ccc';
+            lineChart.options.scales.y.grid.color = isDarkMode ? 'white' : '#ccc';
+            lineChart.update();
+        }
+    }
+    </script>
+   

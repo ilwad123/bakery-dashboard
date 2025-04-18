@@ -19,7 +19,7 @@
             <li><a href="{% url 'predicted-sales' %}"><i class="material-icons">insert_chart</i> Predictions</a></li>
             {% comment %} <li><a href="#Delivery Driver Info"><i class="material-icons">information</i> Delivery Driver Info</a></li> {% endcomment %}
             <li><a href="uploadcsv.html"><i class="material-icons">table_chart</i>Sales History</a></li>
-            <li><a href="{% url 'performance' %}"><i class="material-icons">Performance</i>Performance</a></li>
+            <li><a href="{% url 'performance' %}"><i class="material-icons">speed</i>Performance</a></li>
             <li><a href="{% url 'reports' %}"><i class="material-icons">report</i>Report</a></li>
             {% if user.is_authenticated %}
             <li><a href="{% url 'logout' %}"><i class="material-icons">logout</i> Logout</a></li>
@@ -27,6 +27,9 @@
             <li><a href="{% url 'login' %}"><i class="material-icons">login</i> Login</a></li>
         {% endif %}
         </ul>
+        <button onclick="toggleDarkMode()" class="dark-toggle">
+            🌙 Toggle Dark Mode
+          </button> 
     </div>
     <div class="card">
         <h2>Projected Revenue</h2>
@@ -36,43 +39,45 @@
     <canvas id="predictionChart" height="600"width="1900"></canvas>
     </div>
     <button class="download_pdf">Download PDF</button>
-        <script>
-            const predictedSales = JSON.parse('{{ predicted_sales|safe|escapejs }}');
-            const labels = JSON.parse('{{ dates|safe|escapejs }}');
-            const previousWeekSales = JSON.parse('{{ previous_week_sales|safe|escapejs }}');
-        
-            let sum = 0;
-        
-            // calculate total predicted sales in for loop
-            predictedSales.forEach(total_predicted_sales => {
-                sum += total_predicted_sales;
-            });
-            console.log("Previous Week Sales in JS:", previousWeekSales);
-            //CALCULATE THE PERCENTAGE CHANGE OF THE RRENT WEEKS SALES TO THE PREDICTED SALES FOR THE WEEK
-            {% comment %} const percentageChange = ((total_predicted_sales - previousWeekSales) / previousWeekSales) * 100; {% endcomment %}
-            
-            {% comment %} console.log(`Percentage change: ${percentageChange.toFixed(2)}%`);  {% endcomment %}
-
-            // get the current weeks total sales from the database
-            //compare the percentage of the current weeks sales to the predicted sales for the week
-            // if the current weeks sales are 20% less than the predicted sales, then display a warning message  
-
-            document.addEventListener('DOMContentLoaded', () => {
-                // update the projected total sales on the page
-                document.getElementById("sum").textContent = sum.toLocaleString("en-UK", {
-                    style: "currency",
-                    currency: "GBP",
-                    minimumFractionDigits: 2
-                });
-            });
-            
+    <script>
+        const predictedSales = JSON.parse('{{ predicted_sales|safe|escapejs }}');
+        const labels = JSON.parse('{{ dates|safe|escapejs }}');
+        const previousWeekSales = JSON.parse('{{ previous_week_sales|safe|escapejs }}');
+    
+        let sum = 0;
+    
+        // calculate total predicted sales in for loop
+        predictedSales.forEach(total_predicted_sales => {
+            sum += total_predicted_sales;
+        });
+    
+        console.log("Previous Week Sales in JS:", previousWeekSales);
+    
+        // CALCULATE THE PERCENTAGE CHANGE OF THE CURRENT WEEK'S SALES TO THE PREDICTED SALES FOR THE WEEK
+        {% comment %} const percentageChange = ((total_predicted_sales - previousWeekSales) / previousWeekSales) * 100; {% endcomment %}
+        {% comment %} console.log(`Percentage change: ${percentageChange.toFixed(2)}%`);  {% endcomment %}
+    
+        // get the current week's total sales from the database
+        // compare the percentage of the current week's sales to the predicted sales for the week
+        // if the current week's sales are 20% less than the predicted sales, then display a warning message  
+    
+        let predictionChart;
+    
+        window.onload = function () {
+            // Apply dark mode if stored in localStorage
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+    
+            const isDarkMode = document.body.classList.contains('dark-mode');
+    
             // projected sales for the week display in a card
             console.log("Total Predicted Sales:", sum);
             console.log("Predicted:", predictedSales);
             console.log("Labels:", labels);
-
+    
             const ctx = document.getElementById('predictionChart').getContext('2d');
-            new Chart(ctx, {
+            predictionChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
@@ -88,17 +93,64 @@
                 options: {
                     responsive: true,
                     plugins: {
-                        legend: { display: true }
+                        legend: {
+                            labels: {
+                                color: isDarkMode ? 'white' : '#333'
+                            }
+                        }
                     },
                     scales: {
+                        x: {
+                            ticks: {
+                                color: isDarkMode ? 'white' : '#333',
+                                font: { size: 12 }
+                            },
+                            grid: {
+                                color: isDarkMode ? '#555' : '#ccc'
+                            }
+                        },
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            ticks: {
+                                color: isDarkMode ? 'white' : '#333',
+                                font: { size: 13 }
+                            },
+                            grid: {
+                                color: isDarkMode ? '#555' : '#ccc'
+                            }
                         }
                     }
                 }
             });
+    
+            // update the projected total sales on the page
+            document.getElementById("sum").textContent = sum.toLocaleString("en-UK", {
+                style: "currency",
+                currency: "GBP",
+                minimumFractionDigits: 2
+            });
+        };
+    
     </script>
+    
 </body>
+<script>
+    
+    function toggleDarkMode() {
+        const isDarkMode = document.body.classList.toggle('dark-mode');
+        localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+    
+        if (predictionChart) {
+            predictionChart.options.plugins.legend.labels.color = isDarkMode ? 'white' : '#333';
+            predictionChart.options.scales.x.ticks.color = isDarkMode ? 'white' : '#333';
+            predictionChart.options.scales.y.ticks.color = isDarkMode ? 'white' : '#333';
+            predictionChart.options.scales.x.grid.color = isDarkMode ? 'white' : '#ccc';
+            predictionChart.options.scales.y.grid.color = isDarkMode ? 'white' : '#ccc';
+            predictionChart.update();
+        }
+    }
+    
+    </script>
 </html>
 
 <script src="{% static 'js/pdf.js' %}"></script>

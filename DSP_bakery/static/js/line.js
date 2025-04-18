@@ -18,60 +18,64 @@ currentSalesElement1.textContent = currentSales.toFixed(2);
         document.getElementById("percent").textContent = percent + "%";
     }
 
-const lineCtx = document.getElementById('line').getContext('2d');
-const lineChart = new Chart(lineCtx, {
-    type: 'line',
-    data: {
-        labels: months,
-        datasets: [{
-            label: 'Monthly Sales',
-            data: sales,
-            borderColor:'rgba(255, 99, 132, 1)',
-            borderWidth: 2,
-            fill: false
-        }]
-    },
-    options: {
-        responsive: true,
-        scales: {
-            y: { beginAtZero: true }
+    let lineChart;
+        
+    window.onload = function () {
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
         }
-    }
-});
-
-    // Line graph setup
-    const ctx = document.getElementById('line').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: months1,
-            datasets: [{
-                label: 'Monthly Sales',
-                data: sales1,
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                borderColor: 'rgba(255, 99, 132, 1)',
-                borderWidth: 2,
-                tension: 0.1,
-                fill: false
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: {
-                    ticks: {
-                        font: {
-                            size: 12
+    
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        const lineCtx = document.getElementById('line').getContext('2d');
+    
+        lineChart = new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Monthly Sales',
+                    data: sales,
+                    borderColor:'rgba(255, 99, 132, 1)',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: isDarkMode ? 'white' : '#333'  
                         }
                     }
                 },
-                y: {
-                    ticks: {
-                        font: {
-                            size: 13
+                scales: {
+                    x: {
+                        ticks: {
+                            color: isDarkMode ? 'white' : '#333', 
+                            font: { size: 12 }
+                        },
+                        grid: {
+                            color: isDarkMode ? 'white' : '#ccc',
+                            lineWidth: 0.7
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: isDarkMode ? 'white' : '#333',
+                            font: { size: 13 }
+                        },
+                        grid: {
+                            color: isDarkMode ? 'white' : '#ccc',
+                            lineWidth: 0.7
                         }
                     }
                 }
             }
-        }
-    });
+        });
+    };
+    
+
+    
+    console.log('Chart.js version:', Chart.version);

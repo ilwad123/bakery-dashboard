@@ -664,3 +664,136 @@ fieldset{
         display: none; 
     }
 }
+
+/* DARK MODE SECTION */
+body.dark-mode {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+body.dark-mode .summary,
+body.dark-mode .summary2,
+body.dark-mode .summary3,
+body.dark-mode .summary4 {
+    box-shadow: 0 4px 6px rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+body.dark-mode .sidebar {
+    background-color: #1c1c1c;
+}
+
+body.dark-mode .sidebar a {
+    color: #e0e0e0;
+    transition: all 0.3s ease-in-out;
+}
+
+body.dark-mode .sidebar a:hover {
+    background-color: rgba(108, 36, 76, 0.8);
+    color: white;
+}
+
+body.dark-mode .card,
+body.dark-mode .card1,
+body.dark-mode .card2,
+body.dark-mode .card3,
+body.dark-mode .card4,
+body.dark-mode .card5,
+body.dark-mode .mobile-menu,
+body.dark-mode .topbar {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0;
+}
+
+body.dark-mode .card,
+body.dark-mode .card1,
+body.dark-mode .card2,
+body.dark-mode .card3,
+body.dark-mode .card4,
+body.dark-mode .card5 {
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 6px 12px rgba(108, 36, 76, 0.8); 
+
+}
+
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode p,
+body.dark-mode .card-header h3 {
+    color: #f0f0f0;
+}
+
+body.dark-mode .pagination-links a,
+body.dark-mode .pagination-links1 a {
+    background-color: #6C244C;
+    color: white;
+}
+
+body.dark-mode .pagination-links li strong,
+body.dark-mode .pagination-links1 li strong {
+    background-color: #2a2a2a;
+    color: #fff;
+}
+
+body.dark-mode table {
+    background-color: #1e1e1e;
+}
+
+body.dark-mode th {
+    background-color: #6C244C;
+    color: white;
+}
+
+body.dark-mode td {
+    border-color: #444;
+    color: #ddd;
+}
+
+body.dark-mode .monthly,
+body.dark-mode .export_pdf {
+    background-color: #2c2c2c;
+    color: white;
+}
+
+body.dark-mode .monthly:hover,
+body.dark-mode .export_pdf:hover {
+    background-color: #444;
+}
+
+.dark-toggle {
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin: 10px;
+    transition: background-color 0.3s ease;
+}
+.dark-toggle:hover {
+    background-color: #f0f0f0;
+}
+body.dark-mode .dark-toggle {
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #666;
+}
+body.dark-mode .dark-toggle:hover {
+    background-color: #444;
+}
+
+body.dark-mode .mobile-menu a:hover {
+    color: #f5f5f5;
+    background-color: #6C244C;
+    transition: background-color 0.3s ease;
+}
+body.dark-mode .mobile-menu a {
+    color: #f5f5f5;
+}
+
+/* .mobile-menu .dark-mode a li{
+    background-color: #444;
+    color: #6C244C;
+} */
