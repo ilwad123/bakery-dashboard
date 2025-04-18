@@ -3,6 +3,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script>
+        //TO AVOID THE FLASH
+        const theme = localStorage.getItem('theme');
+        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Performance</title>

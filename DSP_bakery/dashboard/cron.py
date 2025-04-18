@@ -11,7 +11,7 @@ class TestCronJob(CronJobBase):
     code = 'test_cron'
 
     def do(self):
-        if datetime.today().weekday() != 0:  
+        if datetime.today().weekday() != 2:  #update on Wednesday
             print("Not Monday ,skipping job.")
             return
         try:

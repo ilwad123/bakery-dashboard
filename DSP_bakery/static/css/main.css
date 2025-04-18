@@ -784,6 +784,7 @@ body.dark-mode .dark-toggle:hover {
     background-color: #444;
 }
 
+
 body.dark-mode .mobile-menu a:hover {
     color: #f5f5f5;
     background-color: #6C244C;
@@ -797,3 +798,4 @@ body.dark-mode .mobile-menu a {
     background-color: #444;
     color: #6C244C;
 } */
+

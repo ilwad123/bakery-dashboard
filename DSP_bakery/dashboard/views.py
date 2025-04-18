@@ -103,7 +103,23 @@ def generate_pdf(request):
 
         return response
     return JsonResponse({'error': 'Invalid method'}, status=405)
-    
+
+def get_current_sales_week_data():
+    with driver.session() as session:
+        result = session.run("""
+            MATCH (t:Transaction)
+            WHERE datetime(t.Datetime) >= datetime() - duration({ days: 7 })
+            WITH date(datetime(t.Datetime)) AS day, SUM(t.Total) AS total
+            RETURN day, total
+            ORDER BY day DESC
+        """)
+        records = []
+        for record in result:
+            records.append({
+                "day": record["day"].to_native(),
+                "total": record["total"]
+            })
+        return records
         
 def sales_data_CNNLTSM():
     with driver.session() as session:
@@ -155,9 +171,11 @@ def predict_sales_page(request):
     try:
         with open(file_path, "r", encoding="utf-8") as f:
             cron_data = json.load(f)
-        # Extract the predicted sales and dates from the cron output
-        predicted_sales = cron_data["predictions"]
-        dates = cron_data["dates"]
+            predicted_sales = cron_data["predictions"]
+        last_date_str = cron_data["dates"][-1]  
+        last_date = datetime.fromisoformat(last_date_str)
+
+        dates = [(last_date + timedelta(days=i + 1)).date().isoformat() for i in range(7)]
     except Exception as e:
         #if not found then set the predicted sales to 0 and the dates to empty
         predicted_sales = []
