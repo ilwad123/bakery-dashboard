@@ -181,7 +181,11 @@ ul{
     cursor: pointer;
     margin: 10px;
     transition: background-color 0.3s ease;
+    pointer-events: auto !important;
+    z-index: 9999; /* just in case something is blocking it */
+
 }
+
 .dark-toggle:hover {
     background-color: #f0f0f0;
 }
