@@ -47,3 +47,7 @@ class AuthTestCase(TestCase):
 
 # class TestCronJob(TestCase):
     
+
+#focus on the tests on Sunday 
+# fix the requirements table 
+# start writing methodology section 

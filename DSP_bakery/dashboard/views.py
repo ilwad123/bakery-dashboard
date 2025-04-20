@@ -252,6 +252,8 @@ class CaptchaTestForm(forms.Form):
     captcha = CaptchaField() 
     
 def logged_in_login(request):
+    print("⚡ Login view HIT ⚡")
+
     #gets the inputs from the form 
     if request.method == "POST":
         username = request.POST['username']

@@ -155,24 +155,3 @@ body.dark-mode .dark-toggle:hover {
 background-color: #444;
 }
 
-html {
-  background-color: #121212; /* match your dark theme */
-  color: white;
-}
-
-/* Light theme will override this later if needed */
-html.light-mode {
-  background-color: white;
-  color: black;
-}
-
-/* Optional: hide until ready */
-html {
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity 0.2s ease-in;
-}
-html.ready {
-  visibility: visible;
-  opacity: 1;
-}
