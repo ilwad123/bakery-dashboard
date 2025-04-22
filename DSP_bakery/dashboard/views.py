@@ -252,7 +252,7 @@ class CaptchaTestForm(forms.Form):
     captcha = CaptchaField() 
     
 def logged_in_login(request):
-    print("⚡ Login view HIT ⚡")
+    print("Login view HIT")
 
     #gets the inputs from the form 
     if request.method == "POST":
@@ -359,6 +359,7 @@ def driver_info(request):
     return driver_id, total_deliveries, avgDelivTime
 
 def performance_each_driver(request):
+    ## Get the performance data for each driver
     with driver.session() as session:
         result = session.run("""
            MATCH (p:Performance)
@@ -367,6 +368,7 @@ def performance_each_driver(request):
                   p.total_sales AS total_sales,
                   p.total_distance AS total_distance
         """)
+        # Initialise empty lists to store the values
         driver_id = []
         performance_id = []
         total_sales=[]
@@ -383,9 +385,11 @@ def performance_each_driver(request):
         print(total_sales)
         print(total_distance)
         print(sales_per_km)
+        # return the values to be used in the performance page
     return driver_id, performance_id, total_sales, total_distance, sales_per_km
 
 def total_sales_from_the_last_quarter(request):
+    # Get the total sales for the last 3 months
     with driver.session() as session:
         result = session.run("""
             // Matches the transaction node
@@ -411,6 +415,7 @@ def total_sales_from_the_last_quarter(request):
     return quarter_sales
 
 def previous_quarter_sales(request):
+    # Get the total sales for the previous quarter (3 months before the last quarter)
     with driver.session() as session:
         result = session.run("""
             MATCH (t:Transaction)
@@ -434,6 +439,7 @@ def previous_quarter_sales(request):
     return previous_quarter_sales1
 
 def performance_page(request):
+    # Get the performance data for each driver
     driver_id, performance_id, total_sales, total_distance, sales_per_km = performance_each_driver(request)
     quarter_sales = total_sales_from_the_last_quarter(request)
     # Get the driver info
@@ -614,6 +620,8 @@ def plot_monthly_heatmap():
 from datetime import date
 
 def heatmap_holiday(request):
+    # Get the sales data for specific holidays
+    # This query will get the sales data for the specified holidays
     with driver.session() as session:
         heatmap = session.run("""
            MATCH (t:Transaction)
@@ -718,14 +726,7 @@ def classify_heatmap(sales_matrix):
             labels.append(0)  # No increase
     return np.array(labels)
 
-
-@login_required(login_url="/login/")
-def upload(request):
-    return render(request,'uploadcsv.html')
-@login_required(login_url="/login/")
-def reports(request):
-    return render(request,'reports.html')
-
+#test run to see if the neo4j connection works
 def my_view(request):
     # Open a session to run the Neo4j query to see if it works 
     #use the print statement to see if the view is triggered

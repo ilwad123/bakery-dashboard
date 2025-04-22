@@ -330,6 +330,12 @@ box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.1);
     font-weight: 300;
     font-family: 'Montserrat', sans-serif;
 }
+.summary2 h3{
+    color: white;
+    font-size: 1rem;
+    font-weight: 300;
+    font-family: 'Montserrat', sans-serif;
+}
 .summary2 p {
     font-size: 2em;
     font-weight: 700;

@@ -165,4 +165,3 @@ def predict_from_graph_data(df):
 
     return predicted_future_sales_rescaled.flatten()
 
-#compare to old code and add parameters and what not - Monday 

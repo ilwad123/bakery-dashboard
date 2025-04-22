@@ -23,8 +23,6 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('admin/', admin.site.urls),
     path('login/', views.logged_in_login, name='login'), 
-    path('upload/', views.upload, name='upload'), 
-    path('reports/', views.reports, name='reports'),
     path('captcha/', include('captcha.urls')),  # Captcha URL
     path('logout/', views.logout_view, name='logout'),  # Logout view
     path('predicted-sales/', views.predict_sales_page, name='predicted-sales'),

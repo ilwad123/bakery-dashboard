@@ -12,7 +12,7 @@ class TestCronJob(CronJobBase):
 
     def do(self):
         if datetime.today().weekday() != 2:  #update on Wednesday
-            print("Not Monday ,skipping job.")
+            print("Not Wednesday ,skipping job.")
             return
         try:
             # Get the sales data from graph database views.py

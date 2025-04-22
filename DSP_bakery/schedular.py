@@ -1,10 +1,10 @@
 import time
 import subprocess
 
-print("🌀 Starting background cron watcher...")
+print("Starting background cron watcher...")
 
 while True:
-    print("🔁 Checking for due cron jobs...")
+    print("Checking for due cron jobs...")
     subprocess.run(["python", "manage.py", "runcrons"])
     
     # Wait 15 minutes before checking again

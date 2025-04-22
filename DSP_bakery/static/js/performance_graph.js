@@ -1,5 +1,9 @@
 
-
+const isDarkMode= document.body.classList.contains('dark-mode');
+const darkText = '#ffffff';
+const lightText = '#333333';
+const darkGrid = 'rgba(255,255,255,0.1)';
+const lightGrid = '#cccccc';
 const lineCtx = document.getElementById('barchart23').getContext('2d');
 const barchart23 = new Chart(lineCtx, {
     type: 'bar',
@@ -31,15 +35,23 @@ const barchart23 = new Chart(lineCtx, {
         scales: {
             y: {
                 beginAtZero: true,
+                ticks: {
+                    color: isDarkMode ? darkText : lightText
+                },
+                grid: {
+                    color: isDarkMode ? darkGrid : lightGrid
+                },
                 title: {
                     display: true,
-                    text: 'Total Deliveries'
+                    text: 'Total Deliveries',
+                    color: isDarkMode ? darkText : lightText
                 }
             },
             x: {
                 title: {
                     display: true,
-                    text: 'Driver ID'
+                    text: 'Driver ID',
+                    color: isDarkMode ? darkText : lightText
                 }
             }
         }
