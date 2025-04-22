@@ -1,4 +1,4 @@
-LOAD CSV WITH HEADERS FROM "file:///sales_modified4.csv" AS csv
+LOAD CSV WITH HEADERS FROM "file:///sales_modified5.csv" AS csv
 
 CREATE (t:Transaction {
     Datetime: datetime(replace(csv.datetime, " ", "T")), 
