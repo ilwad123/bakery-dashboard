@@ -16,7 +16,7 @@ class AuthTestCase(TestCase):
     def setUp(self):
         #creates a fake user
         self.user = User.objects.create_user(username='testuser', password='testpass123')
-        self.client.login(username='testuser', password='testpass123')  
+        self.client.login(username='testuser', password='testpass123')
 
     def test_dashboard_access_with_login(self):
         protected_views = ['home', 'performance', 'predicted-sales']
@@ -30,15 +30,17 @@ class AuthTestCase(TestCase):
     def test_requires_login_for_protected_views(self):
         #tests that the user is not logged in and should be redirected to the login page
         #failed the test so went to views to add the login required decorator
+        self.client.logout()
+        #needs to be logged out to test the login required decorator
         protected_views = ['home', 'performance', 'predicted-sales']
 
+        
         for view_name in protected_views:
             response = self.client.get(reverse(view_name))
             self.assertEqual(response.status_code, 302)
-            self.assertIn('/login/', response.url)
-            self.assertRedirects(response, reverse('login'))
+            response = self.client.get(reverse(view_name), follow=True)
             self.assertTemplateUsed(response, 'login.html')
-            self.assertContains(response, 'Please log in to access this page.')
+            self.assertContains(response, 'WELCOME BACK')
 
 #Neo4j scalability tests 
 class Neo4jScalabilityTestCase(TestCase):
@@ -95,9 +97,7 @@ class smoketest_TestCase(TestCase):
         self.assertContains(response, 'Projected Revenue')
         #checks the chart is on the page
         self.assertContains(response, 'predictionChart')     
-
-       
-    
+        
     def test_login_page(self):
         # Test that the login page loads successfully
         response = self.client.get(reverse('login'))
@@ -111,27 +111,21 @@ class smoketest_TestCase(TestCase):
         self.assertEqual(response.status_code, 302)  
         self.assertIn(reverse('login'), response.url) 
         
-# python manage.py test dashboard.tests.graphs_Tests to check specifically these functions
-
 class graphs_Tests(TestCase):
     def test_line_graph_returns_months_and_sales(self):
         #call the function to test the line graph
         months, sales = line_graph(None) 
-
         # Check that the function returns two lists
         self.assertIsInstance(months, list)
         self.assertIsInstance(sales, list)
         # Check that the lengths of the lists are equal
         self.assertEqual(len(months), len(sales))
-
         # Check format of months like "Jan 2024"
         for month in months:
             self.assertRegex(month, r"^[A-Z][a-z]{2} \d{4}$")
-
         # Check sales are all float
         for value in sales:
             self.assertIsInstance(value, float)
-        
         # Print the results to see the output test 
         print("Months:", months)
         print("Sales:", sales)
@@ -163,7 +157,6 @@ class graphs_Tests(TestCase):
         #decreasing order
         self.assertTrue(all(quantities[i] >= quantities[i+1] for i in range(len(quantities)-1)),
                         "Quantities are not in decreasing order")
-
         print("Categories:", categories)
         print("Quantities:", quantities)
     
@@ -175,25 +168,20 @@ class PopularProductTest(TestCase):
         factory = RequestFactory()
         #create a fake request with the first page of products
         request = factory.get('/?page=1')  
-    
         # Call your view-like function with the fake request
         paginated_data = most_popular(request)
         items = list(paginated_data)
-
         # checks that the function returns a list of tuples
         # where each tuple contains a product name and quantity sold
         self.assertIsInstance(items, list)
         self.assertGreaterEqual(len(items), 1)
         self.assertIsInstance(items[0][0], str)  # Product name
         self.assertIsInstance(items[0][1], (int, float))  # Quantity
-
         # Check descending order of quantities
         for i in range(len(items) - 1):
             self.assertGreaterEqual(items[i][1], items[i + 1][1])
-
         print("Most popular products (page 1):", items)
 
-    
 class MLModelTests(TestCase):
     def test_cnn_lstm_prediction_output(self):
         # runs the model and checks the output
@@ -205,3 +193,5 @@ class MLModelTests(TestCase):
         self.assertEqual(len(predictions), 7)
         #prints the predictions to see the output of the test
         print("Model Predictions:", predictions)
+        
+

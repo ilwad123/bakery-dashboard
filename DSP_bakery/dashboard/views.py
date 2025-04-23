@@ -137,7 +137,7 @@ def sales_data_CNNLTSM():
             })
         return pd.DataFrame(records)
 
-
+@login_required(login_url="/login/")
 def predict_sales_page(request):
     with driver.session() as session:
         result = session.run("""
@@ -252,7 +252,7 @@ class CaptchaTestForm(forms.Form):
     captcha = CaptchaField() 
     
 def logged_in_login(request):
-    print("Login view HIT")
+    print("Login view hit")
 
     #gets the inputs from the form 
     if request.method == "POST":
@@ -438,6 +438,7 @@ def previous_quarter_sales(request):
         print("Quarter sales (previous_quarter):", previous_quarter_sales1)
     return previous_quarter_sales1
 
+# @login_required(login_url="/login/")
 def performance_page(request):
     # Get the performance data for each driver
     driver_id, performance_id, total_sales, total_distance, sales_per_km = performance_each_driver(request)
