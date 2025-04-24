@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from neo4j import GraphDatabase
 import time
-from .views import line_graph ,bar_graph, popular_category,sales_data_CNNLTSM,most_popular
+from .views import line_graph ,bar_graph, popular_category,sales_data_CNNLTSM,most_popular,performance_each_driver,driver_info
 from .cnn_model import predict_from_graph_data
 
 from django.urls import reverse
@@ -15,8 +15,8 @@ import torch
 class AuthTestCase(TestCase):
     def setUp(self):
         #creates a fake user
-        self.user = User.objects.create_user(username='testuser', password='testpass123')
-        self.client.login(username='testuser', password='testpass123')
+        self.user = User.objects.create_user(username='test', password='password123')
+        self.client.login(username='test', password='password123')
 
     def test_dashboard_access_with_login(self):
         protected_views = ['home', 'performance', 'predicted-sales']
@@ -71,8 +71,8 @@ class smoketest_TestCase(TestCase):
             #302 means it redirected to the login page
     def setUp(self):
         #creates a fake user
-        self.user = User.objects.create_user(username='testuser', password='testpass123')
-        self.client.login(username='testuser', password='testpass123')
+        self.user = User.objects.create_user(username='test', password='password123')
+        self.client.login(username='test', password='password123')
 
     def test_smoke_test(self):
         # Test that the home page loads successfully
@@ -195,3 +195,62 @@ class MLModelTests(TestCase):
         print("Model Predictions:", predictions)
         
 
+class DriverInfoTests(TestCase):
+    def test_driver_info_returns_correct_structure(self):
+        driver_ids, total_deliveries, avg_times = driver_info(None)
+
+        # Ensure all lists are the same length
+        self.assertEqual(len(driver_ids), len(total_deliveries))
+        self.assertEqual(len(driver_ids), len(avg_times))
+
+        #checks the data types are right 
+        for d in driver_ids:
+            self.assertIsInstance(d, (int, str))
+        for t in total_deliveries:
+            self.assertIsInstance(t, (int, float))
+        for a in avg_times:
+            self.assertIsInstance(a,str)
+
+  
+        print("Driver Info Test Passed:", driver_ids, total_deliveries, avg_times)
+
+
+class PerformanceEachDriverTests(TestCase):
+    def test_performance_data_returns_valid_metrics(self):
+        driver_ids, perf_ids, total_sales, total_distance, sales_per_km = performance_each_driver(None)
+
+        #lengths match 
+        #so the system doesn't break 
+        self.assertEqual(len(driver_ids), len(perf_ids))
+        self.assertEqual(len(perf_ids), len(total_sales))
+        self.assertEqual(len(total_sales), len(total_distance))
+        self.assertEqual(len(sales_per_km), len(driver_ids))
+
+        self.assertTrue(all(isinstance(val, (int, str)) for val in driver_ids))
+        self.assertTrue(all(isinstance(val, (int, float)) for val in total_sales))
+        self.assertTrue(all(isinstance(val, (int, float)) for val in total_distance))
+        self.assertTrue(all(isinstance(val, float) for val in sales_per_km))
+
+        print("Performance Per Driver:", driver_ids, sales_per_km)
+
+class popularTestCase(TestCase):
+    def setUp(self):
+        #creates a fake user
+        self.user = User.objects.create_user(username='test', password='password123')
+        self.client.login(username='test', password='password123')
+    
+    def test_popular_association_appears_in_bakery_template(self):
+        response = self.client.get(reverse('home')) 
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'bakery.html')
+
+        #checks the table and the 
+        self.assertContains(response, '<table id="Popular_Product_Associations">', html=True)
+        self.assertContains(response, 'Popular Product Associations', msg_prefix="Expected table heading not found")
+
+        #checks the data and columns are right
+        self.assertContains(response, '<tr', count=4, msg_prefix="Expected at least 4 columns product association row")
+        self.assertContains(response, '<td', count=1, msg_prefix="Expected at least 1 row of data exists")
+
+        print("Popular product association table renders correctly in bakery.html")
+    

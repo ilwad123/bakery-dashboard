@@ -6,15 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bakery Dashboard</title>
     <link href="{% static 'css/main.css' %}" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://www.w3schools.com/lib/w3.js"></script>
-    <script src="https://cdn.skypack.dev/@hotwired/turbo"></script>
 
 </head>
 
@@ -182,7 +180,7 @@
 <!-- Pinky red colour  -->   
     <div class="summary2" style= "background: linear-gradient(to right, #A88BEB, #867AE9);">
         <h3>Number of Delivery Drivers</h3>
-        <p>{{num_of_drivers}}</span></p>
+        <p><span>{{num_of_drivers}}</span></p>
         <!-- Purple colour  -->
          {% comment %} maybe change it to pending orders instead {% endcomment %}
 
@@ -282,7 +280,7 @@
          <div class="card5">
             <h2>Popular Product Combinations</h2>
             <button class="export_pdf">Export PDF</button>
-            <table id="sortable">                
+            <table id="Popular_Product_Associations">                
                 <thead>
                     <tr>
                         <th>Rank</th>

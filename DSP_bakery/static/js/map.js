@@ -28,12 +28,24 @@
      'Brislington': [51.441000, -2.535000]
  };
 
- // Add markers for each location
- for (const [name, coords] of Object.entries(locations)) {
-     L.marker(coords).addTo(map)
-         .bindPopup(`<b>${name}</b>`) // Popup displays location name
-         .openPopup();
- }
+ const customIcon = L.icon({
+    iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+    iconSize: [48, 48], // Make the icon bigger
+    iconAnchor: [24, 48], // So it points properly
+    popupAnchor: [0, -40] // Adjust popup position if needed
+});
+
+for (const [name, coords] of Object.entries(locations)) {
+    L.marker(coords, { icon: customIcon }).addTo(map)
+        .bindPopup(`<b>${name}</b>`);
+}
+
+//  // Add markers for each location
+//  for (const [name, coords] of Object.entries(locations)) {
+//      L.marker(coords).addTo(map)
+//          .bindPopup(`<b>${name}</b>`) // Popup displays location name
+//          .openPopup();
+//  }
 const mapTitle = L.control({ position: 'topcenter' });
 
 mapTitle.onAdd = function () {
