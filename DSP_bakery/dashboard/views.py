@@ -164,28 +164,22 @@ def predict_sales_page(request):
     #     last_date = df['date'].max()
     #     dates.append((last_date + timedelta(days=i+1)).isoformat())
     
-    #would get the predicted sales from the cron job
     file_path = os.path.join(settings.BASE_DIR, "predicted_sales_cron_output.json")
 
     try:
         with open(file_path, "r", encoding="utf-8") as f:
             cron_data = json.load(f)
-            predicted_sales = cron_data["predictions"]
-        last_date_str = cron_data["dates"][-1]  
-        last_date = datetime.fromisoformat(last_date_str)
-
-        dates = [(last_date + timedelta(days=i + 1)).date().isoformat() for i in range(7)]
+            predicted_sales = cron_data["predictions"] #get the predictions from the json 
+            dates = cron_data["dates"]  #get the dates from the file 
     except Exception as e:
-        #if not found then set the predicted sales to 0 and the dates to empty
         predicted_sales = []
         dates = []
         print("Failed to load cron output:", e)
 
     return render(request, 'predicted_sales.html', {
-        'predicted_sales': json.dumps(predicted_sales),  
+        'predicted_sales': json.dumps(predicted_sales),
         'dates': json.dumps(dates),
         'previous_week_sales': json.dumps(previous_week_sales)
-
     })
 
     
