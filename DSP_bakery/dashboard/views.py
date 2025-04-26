@@ -48,7 +48,6 @@ driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USERNAME,
 
 from neo4j.time import DateTime as Neo4jDateTime
 
-from .cnn_model import predict_from_graph_data
 import pandas as pd
 from datetime import datetime
 from datetime import date, timedelta
