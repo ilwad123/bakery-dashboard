@@ -204,10 +204,6 @@ def home(request):
     month_heatmap=plot_monthly_heatmap()
     holiday_heatmap=plot_holiday_heatmap()
     popular_asso = popular_product_association_list(request)
-    # weather_data = weather_heatmap(request)
-
-    
-    
     timestamp = int(datetime.now().timestamp())
 
     context = {
@@ -231,8 +227,6 @@ def home(request):
         # 'weather_data': weather_data  # Include weather data in context
 
     }
-    
-
     # PREVENTS UNAUTHORISED ACESS WHEN LOGGED OUT ALREADY 
     # Clears the browser cache for this page.
     response = render(request, 'bakery.html', context)

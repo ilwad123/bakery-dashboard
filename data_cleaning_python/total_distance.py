@@ -88,4 +88,4 @@ for driver_id, total_distance in total_distances.items():
 transactions = pd.read_csv('performance.csv')
 #make a column for total distance for each driver_id
 transactions['total_distance'] = transactions['Driver_id'].map(total_distances)
-transactions.to_csv('performance.csv', index=False)
+transactions.to_csv('./static/data_files/performance.csv', index=False)
