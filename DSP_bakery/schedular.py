@@ -9,4 +9,4 @@ while True:
     
     # Wait 5 minutes before checking again
     time.sleep(300)  # 300 seconds = 15 minutes
-    print("Waiting for 15 minutes before next check...")
+    print("Waiting for 5 minutes before next check...")

@@ -29,13 +29,26 @@
             🌙 Toggle Dark Mode
           </button> 
     </div>
+    <div class= "container"> 
     <div class="card">
         <h2>Projected Revenue</h2>
         <p class="sum"><span id="sum"></span><span id="arrow1"></span></p>
     </div>
-    <div class ="card2">
-    <canvas id="predictionChart" height="600"width="1900"></canvas>
+    <div class ="card3">
+        <polyline 
+            id="graphLine" 
+            fill="none" 
+            stroke="#333333"  
+            stroke-width="3" 
+            points="0,40 20,30 40,20 60,25 80,10 100,15" />
+    </svg>
+
+        <span id="change_message"></span>
     </div>
+    <div class ="card2">
+    <canvas id="predictionChart" height="900"width="2200"></canvas>
+    </div>
+</div>
     <button class="download_pdf">Download PDF</button>
     <script>
         const predictedSales = JSON.parse('{{ predicted_sales|safe|escapejs }}');
@@ -49,18 +62,44 @@
             sum += total_predicted_sales;
         });
     
-        console.log("Previous Week Sales in JS:", previousWeekSales);
-    
-        // CALCULATE THE PERCENTAGE CHANGE OF THE CURRENT WEEK'S SALES TO THE PREDICTED SALES FOR THE WEEK
-        {% comment %} const percentageChange = ((total_predicted_sales - previousWeekSales) / previousWeekSales) * 100; {% endcomment %}
-        {% comment %} console.log(`Percentage change: ${percentageChange.toFixed(2)}%`);  {% endcomment %}
-    
+        currentSales=previousWeekSales
+        console.log("Current Week Sales:", currentSales);
+        
         // get the current week's total sales from the database
         // compare the percentage of the current week's sales to the predicted sales for the week
         // if the current week's sales are 20% less than the predicted sales, then display a warning message  
     
+        // CALCULATE THE PERCENTAGE CHANGE OF THE CURRENT WEEK'S SALES TO THE PREDICTED SALES FOR THE WEEK
+
+        const percentageChange = ((sum - currentSales) / currentSales) * 100; 
+        console.log(`Percentage change: ${percentageChange.toFixed(2)}%`); 
         let predictionChart;
-    
+
+        // displays the message based on the percentage change
+        let changeType = "";
+
+        if (parseFloat(percentageChange) > 0) {
+            changeType = "increase";
+        } else {
+            changeType = "decrease";
+        }
+
+        const message = `Predicted week ${changeType}d by ${Math.abs(percentageChange).toFixed(2)}% compared to current week sales.`;
+
+        console.log(message);
+
+        const result= document.getElementById("change_message")
+        result.innerText= message
+
+        // Create the arrow dynamically if decrease
+        if (changeType === "decrease") {
+            const arrow = document.createElement("div");
+            arrow.className = "arrow-down"; // Apply the CSS arrow
+            // Insert the arrow BEFORE the text
+            result.parentNode.insertBefore(arrow, result);
+        }
+            
+
         window.onload = function () {
             // Apply dark mode if stored in localStorage
             if (localStorage.getItem('theme') === 'dark') {

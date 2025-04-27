@@ -54,72 +54,8 @@ from datetime import date, timedelta
 
 from django.shortcuts import render
 import json
+from datetime import date, timedelta
 
-import base64
-from io import BytesIO
-from django.http import JsonResponse
-from django.http import HttpResponse
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from django.views.decorators.csrf import csrf_exempt
-from PIL import Image
-from io import BytesIO
-import io
-
-@csrf_exempt
-def generate_pdf(request):
-    if request.method == 'POST':
-        # Get JSON data from the request
-        data = json.loads(request.body)
-        chart_image_data = data['chart_ima  ge']
-        revenue = data['revenue']
-        
-        # Decode the base64 image
-        chart_image_data = chart_image_data.split(",")[1]  # Remove the prefix part of base64
-        chart_image = base64.b64decode(chart_image_data)
-
-        # Create a temporary image file
-        image = Image.open(BytesIO(chart_image))
-        image_path = '/tmp/chart_image.png'
-        image.save(image_path)
-
-        # Create a response to return a PDF
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="sales_report.pdf"'
-
-        # Create the PDF using ReportLab
-        p = canvas.Canvas(response, pagesize=letter)
-
-        # Add the revenue text
-        p.drawString(100, 750, f"Projected Revenue: {revenue}")
-
-        # Add the chart image
-        p.drawImage(image_path, 100, 500, width=400, height=200)
-
-        # Save the PDF
-        p.showPage()
-        p.save()
-
-        return response
-    return JsonResponse({'error': 'Invalid method'}, status=405)
-
-def get_current_sales_week_data():
-    with driver.session() as session:
-        result = session.run("""
-            MATCH (t:Transaction)
-            WHERE datetime(t.Datetime) >= datetime() - duration({ days: 7 })
-            WITH date(datetime(t.Datetime)) AS day, SUM(t.Total) AS total
-            RETURN day, total
-            ORDER BY day DESC
-        """)
-        records = []
-        for record in result:
-            records.append({
-                "day": record["day"].to_native(),
-                "total": record["total"]
-            })
-        return records
-        
 def sales_data_CNNLTSM():
     with driver.session() as session:
         result = session.run("""
@@ -136,22 +72,47 @@ def sales_data_CNNLTSM():
             })
         return pd.DataFrame(records)
 
+def get_last_complete_business_week(today=None):
+    if today is None:
+        today = date.today()
+
+    today_weekday = today.weekday()
+    days_since_last_tuesday = (today_weekday - 1) % 7
+    last_tuesday = today - timedelta(days=days_since_last_tuesday)
+    last_wednesday = last_tuesday - timedelta(days=6)
+    return last_wednesday, last_tuesday
+
 @login_required(login_url="/login/")
 def predict_sales_page(request):
+    #Fake today's date for testing when production starts with real data would remove fake_today
+    fake_today = date(2024, 4, 5)
+    last_wednesday, last_tuesday = get_last_complete_business_week(today=fake_today)
+
     with driver.session() as session:
         result = session.run("""
             MATCH (t:Transaction)
-            WHERE datetime(t.Datetime) >= datetime() - duration({ days: 7 })
-            WITH date(datetime(t.Datetime)) AS day, SUM(t.Total) AS total
+            WHERE date(t.Datetime) >= date($start_date)
+              AND date(t.Datetime) <= date($end_date)
+            WITH date(t.Datetime) AS day, SUM(t.Total) AS total
             RETURN day, total
-            ORDER BY day DESC
+            ORDER BY day
+        """, start_date=str(last_wednesday), end_date=str(last_tuesday))
+        #queries the start_date and end_date of the last 7 day window of wednesday and Tuesday 
 
-        """)
-        previous_week_sales = [
-            {"day": (record["day"]).native(), "total": record["total"]}
+        current_week_sales = [
+            {"day": record["day"], "total": record["total"]}
             for record in result
         ]
 
+        current_week_sales_total = 0 
+        #loops through list of totals and increments into current sales total 
+        for day_data in current_week_sales:
+            current_week_sales_total += day_data["total"]
+
+        print(current_week_sales, "week")
+        print(current_week_sales_total, "total")
+
+            
     # # gets the sales data from graph database 
     # df = sales_data_CNNLTSM()
     # #get the results from the algorithm in cnn_model.py
@@ -179,8 +140,9 @@ def predict_sales_page(request):
     return render(request, 'predicted_sales.html', {
         'predicted_sales': json.dumps(predicted_sales),
         'dates': json.dumps(dates),
-        'previous_week_sales': json.dumps(previous_week_sales)
+        'previous_week_sales': json.dumps(current_week_sales_total)
     })
+
 
     
 @login_required(login_url="/login/")
