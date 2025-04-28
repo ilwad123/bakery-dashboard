@@ -1,5 +1,3 @@
-from django.http import HttpResponse
-from django.shortcuts import render
 from django.shortcuts import render
 from neo4j import GraphDatabase
 import os
@@ -24,37 +22,27 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+#used for cache 
 from django.shortcuts import render
 from django.utils.cache import patch_cache_control
 
-import openmeteo_requests
-import requests_cache
-import pandas as pd
-from retry_requests import retry
-from datetime import date, timedelta
 
+import pandas as pd
+from datetime import date, timedelta
+from datetime import datetime
+#used to retrieve cnn model 
 from .cnn_model import predict_from_graph_data
 import pandas as pd
-import datetime
-from datetime import datetime
+
+from neo4j.time import DateTime as Neo4jDateTime
 
 
 # Set up logging
-
 matplotlib.use('Agg')
 
 
 driver = GraphDatabase.driver(settings.NEO4J_URI, auth=(settings.NEO4J_USERNAME, settings.NEO4J_PASSWORD))
 
-from neo4j.time import DateTime as Neo4jDateTime
-
-import pandas as pd
-from datetime import datetime
-from datetime import date, timedelta
-
-from django.shortcuts import render
-import json
-from datetime import date, timedelta
 
 def sales_data_CNNLTSM():
     with driver.session() as session:
@@ -75,11 +63,16 @@ def sales_data_CNNLTSM():
 def get_last_complete_business_week(today=None):
     if today is None:
         today = date.today()
+        #gets the current date 
 
-    today_weekday = today.weekday()
-    days_since_last_tuesday = (today_weekday - 1) % 7
+
+    today_weekday = today.weekday() #gets the current dayofweek as num 
+    days_since_last_tuesday = (today_weekday - 1) % 7 # calculates how many days passed from tuesday=1
     last_tuesday = today - timedelta(days=days_since_last_tuesday)
+    #Subtracts the number of days since the last Tuesday to get the date of the last Tuesday
     last_wednesday = last_tuesday - timedelta(days=6)
+    # Subtracts 6 days from the last Tuesday to get the date of the last Wednesday
+    #returns results
     return last_wednesday, last_tuesday
 
 @login_required(login_url="/login/")
@@ -387,7 +380,7 @@ def previous_quarter_sales(request):
         print("Quarter sales (previous_quarter):", previous_quarter_sales1)
     return previous_quarter_sales1
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 def performance_page(request):
     # Get the performance data for each driver
     driver_id, performance_id, total_sales, total_distance, sales_per_km = performance_each_driver(request)
