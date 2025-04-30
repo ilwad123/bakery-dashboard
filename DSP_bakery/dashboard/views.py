@@ -270,6 +270,7 @@ def driver_info(request):
         result = session.run("""
             MATCH (d:Driver)
             RETURN d.Driver_id AS driver_id,
+                    d.Driver_name AS name,                 
                    d.total_deliveries AS total_deliveries,
                    d.avgDelivTime AS avgDelivTime
         """)
@@ -277,6 +278,7 @@ def driver_info(request):
         driver_id = []
         total_deliveries = []
         avgDelivTime = []
+        all_drivers = []
 
         # Iterate through the result and process each record
         for record in result:
@@ -292,13 +294,29 @@ def driver_info(request):
                 normal_time = "00:00:00"  # Default value if there's no time data
 
             avgDelivTime.append(normal_time)
+        
+            driver_data = {
+                "driver_id": record["driver_id"],
+                "name": record["name"],
+                "total_deliveries": record["total_deliveries"],
+                "avgDelivTime": normal_time
+            }
+            all_drivers.append(driver_data)
 
+        # Find top driver by total deliveries
+        if all_drivers:
+            top_driver = max(all_drivers, key=lambda d: d["total_deliveries"])
+            top_driver["rank"] = 1
+        else:
+            top_driver = None
+            
         # Debug print to check the data
         print(driver_id)
         print(total_deliveries)
         print(avgDelivTime)
 
-    return driver_id, total_deliveries, avgDelivTime
+    return driver_id, total_deliveries, avgDelivTime,top_driver
+
 
 def performance_each_driver(request):
     ## Get the performance data for each driver
@@ -386,7 +404,7 @@ def performance_page(request):
     driver_id, performance_id, total_sales, total_distance, sales_per_km = performance_each_driver(request)
     quarter_sales = total_sales_from_the_last_quarter(request)
     # Get the driver info
-    driver_id, total_deliveries, avgDelivTime = driver_info(request)
+    driver_id, total_deliveries, avgDelivTime,top_driver = driver_info(request)
     previous_quarter_sales1 = previous_quarter_sales(request)
     context = {
         'driver_id': json.dumps(driver_id),
@@ -398,6 +416,8 @@ def performance_page(request):
         'total_deliveries': json.dumps(total_deliveries),
         'avgDelivTime': json.dumps(avgDelivTime),
         'previous_quarter_sales': json.dumps(previous_quarter_sales1),
+        'top_driver': top_driver,
+
         # 'timestamp': int(datetime.now().timestamp())
         #COULD ADD THIS AT THE TOP OF THE PAGE TO SHOW IT HAS BEEN UPDATED
     }   

@@ -52,18 +52,28 @@
             <span id="percent_change" class="percent_change"></span>
         </div>
         <div class="card4">
-            <h2>Average delivery time of all Drivers</h2>
+            <h2 style="font-size:22px;">Average delivery time of all Drivers</h2>
             <div class="inline-content">
-            <span id="AverageDelivery" class="AverageDelivery"></span><p>minutes</p>
+            <span id="AverageDelivery" class="AverageDelivery" style="font-size:20px"></span>
+            <p style="font-size:20px">minutes</p>
             </div>
         </div>
-            <div class="card_top-driver">
-                <h4>Top Driver</h4>
-                <p><strong>Name:</strong> Driver 2</p>
-                <p><strong>Driver ID:</strong> 102</p>
-                <p><strong>Total Deliveries:</strong> 550</p>
-                {% comment %} Driver_id {% endcomment %}
-                {% comment %} Total deliveries {% endcomment %}
+        <div class="card_top-driver" style="height: 100px; margin-top: 20px;">
+                {% if top_driver %}
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                    <i class="fas fa-trophy" style="color: gold; font-size: 28px;"></i>
+                    <h3 style="margin: 0;margin-right:10px;font-size: 22px; font-weight: bold;">
+                        Top Driver #{{ top_driver.rank }}
+                    </h3>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px; font-size: 16px; line-height: 1.5;">
+                    <div><strong>{{ top_driver.name }}</strong></div>
+                    <div><strong>Driver ID:</strong> {{ top_driver.driver_id }}</div>
+                    <div><strong>Total Deliveries:</strong> {{ top_driver.total_deliveries }}</div>
+                </div>
+            {% else %}
+                <p>No top driver available.</p>
+            {% endif %}
         </div>
     </div>
         <div class="chart-container">
