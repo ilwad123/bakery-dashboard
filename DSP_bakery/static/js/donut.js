@@ -2,6 +2,7 @@ const myUniqueDonutCTX = document.getElementById('donut').getContext('2d');
 
     const isDarkMode = document.body.classList.contains('dark-mode');
     const text = isDarkMode ? 'white' : '#333';
+   
     donutChart = new Chart(myUniqueDonutCTX, {
         type: 'doughnut',
         data: {
