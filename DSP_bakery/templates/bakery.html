@@ -366,10 +366,8 @@ function toggleMenu() {
             barChart.update();
         }
         if (donutChart) {
-            const textColor = isDarkMode ? 'white' : '#333';
-
-            donutChart.options.plugins.legend.labels.color = textColor;
-            donutChart.options.plugins.title.color = textColor; 
+            donutChart.options.plugins.legend.labels.color = isDarkMode ? 'white' : '#333';
+            donutChart.options.plugins.title.color = isDarkMode ? 'white' : '#333'; 
             donutChart.update();
         }
     }
