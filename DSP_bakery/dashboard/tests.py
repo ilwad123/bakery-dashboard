@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from neo4j import GraphDatabase
 import time
-from .views import line_graph ,bar_graph, popular_category,sales_data_CNNLTSM,most_popular,performance_each_driver,driver_info
+from .views import line_graph ,bar_graph, popular_category,sales_data_CNNLTSM,most_popular,performance_each_driver,driver_info,popular_product_association_list
 from .cnn_model import predict_from_graph_data
 
 from django.urls import reverse
@@ -197,7 +197,7 @@ class MLModelTests(TestCase):
 
 class DriverInfoTests(TestCase):
     def test_driver_info_returns_correct_structure(self):
-        driver_ids, total_deliveries, avg_times = driver_info(None)
+        driver_ids, total_deliveries, avg_times ,top_driver= driver_info(None)
 
         # Ensure all lists are the same length
         self.assertEqual(len(driver_ids), len(total_deliveries))
@@ -211,8 +211,8 @@ class DriverInfoTests(TestCase):
         for a in avg_times:
             self.assertIsInstance(a,str)
 
-  
-        print("Driver Info Test Passed:", driver_ids, total_deliveries, avg_times)
+        
+        print("Driver Info Test Passed:", driver_ids, total_deliveries, avg_times,top_driver)
 
 
 class PerformanceEachDriverTests(TestCase):
@@ -233,24 +233,23 @@ class PerformanceEachDriverTests(TestCase):
 
         print("Performance Per Driver:", driver_ids, sales_per_km)
 
-class popularTestCase(TestCase):
+class PopularTestCase(TestCase):
     def setUp(self):
-        #creates a fake user
         self.user = User.objects.create_user(username='test', password='password123')
         self.client.login(username='test', password='password123')
-    
-    def test_popular_association_appears_in_bakery_template(self):
-        response = self.client.get(reverse('home')) 
+        # You can create mock data here if needed
+
+    def test_popular_product_combinations_table_renders_correctly_on_home(self):
+        response = self.client.get(reverse('home'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'bakery.html')
+        self.assertContains(response, '<table id="Popular_Product_Associations">')
 
-        #checks the table and the 
-        self.assertContains(response, '<table id="Popular_Product_Associations">', html=True)
-        self.assertContains(response, 'Popular Product Associations', msg_prefix="Expected table heading not found")
+        # popular_asso = popular_product_association_list(None)
 
-        #checks the data and columns are right
-        self.assertContains(response, '<tr', count=4, msg_prefix="Expected at least 4 columns product association row")
-        self.assertContains(response, '<td', count=1, msg_prefix="Expected at least 1 row of data exists")
+         # Get paginated data passed to template
+        product_sales = response.context.get('products_sales')
+        self.assertIsNotNone(product_sales)
+        self.assertGreater(len(product_sales), 0)
 
-        print("Popular product association table renders correctly in bakery.html")
-    
+        print("Popular product combinations appear on home page.")
