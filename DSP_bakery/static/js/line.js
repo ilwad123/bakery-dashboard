@@ -56,8 +56,8 @@ currentSalesElement1.textContent = currentSales.toFixed(2);
                             font: { size: 12 }
                         },
                         grid: {
-                            color: isDarkMode ? 'white' : '#ccc',
-                            lineWidth: 0.7
+                            color:isDarkMode ? 'rgba(255,255,255,0.2)' : '#ccc',
+                            lineWidth: 0.5
                         }
                     },
                     y: {
@@ -67,8 +67,8 @@ currentSalesElement1.textContent = currentSales.toFixed(2);
                             font: { size: 13 }
                         },
                         grid: {
-                            color: isDarkMode ? 'white' : '#ccc',
-                            lineWidth: 0.7
+                            color: isDarkMode ? 'rgba(255,255,255,0.2)' : '#ccc',
+                            lineWidth: 0.5
                         }
                     }
                 }

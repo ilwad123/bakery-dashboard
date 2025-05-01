@@ -330,67 +330,10 @@
                 <script src="{% static 'js/map.js' %}"></script>
         </div>
     </div>
-        
-    <script src="{% static 'js/line.js' %}"></script>
-    <script src="{% static 'js/bar.js' %}"></script>
-    <script src="{% static 'js/linesummary.js' %}"></script>
-    <script src="{% static 'js/transaction.js' %}"></script>
-    <script src="{% static 'js/sortable.js' %}"></script>
+
 </main>
 </body>
-<script>
-    //donut javascript 
-    const myUniqueDonutCTX = document.getElementById('donut').getContext('2d');
 
-    const donutChart = new Chart(myUniqueDonutCTX, {
-        type: 'doughnut',
-        data: {
-            labels: categories, 
-            datasets: [{
-                data: quantities, 
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.4)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                },
-                title: {
-                    display: true,
-                    text: 'Total Sales per Product'
-                },
-                tooltip: { 
-                    callbacks: {
-                        label: function (tooltipItem) {
-                            const dataset = this.chart.data.datasets[tooltipItem.datasetIndex];
-                            //get the sum of the quantites and iterates through the array
-                            //initially at zero 
-                            const total = dataset.data.reduce((sum, value) => sum + value, 0);
-                            const currentValue = dataset.data[tooltipItem.dataIndex];
-                            const percentage = Math.floor(((currentValue / total) * 100) + 0.5);
-                            return percentage + "%" + ',' + currentValue;
-                        }
-                    }
-                }
-            }
-        }
-    });    
-    
-</script>
 <script>
 function toggleMenu() {
     const sidebar = document.querySelector('.sidebar');
@@ -409,12 +352,34 @@ function toggleMenu() {
             lineChart.options.plugins.legend.labels.color = isDarkMode ? 'white' : '#333';
             lineChart.options.scales.x.ticks.color = isDarkMode ? 'white' : '#333';
             lineChart.options.scales.y.ticks.color = isDarkMode ? 'white' : '#333';
-            lineChart.options.scales.x.grid.color = isDarkMode ? 'white' : '#ccc';
-            lineChart.options.scales.y.grid.color = isDarkMode ? 'white' : '#ccc';
+            lineChart.options.scales.x.grid.color = isDarkMode ? 'rgba(255,255,255,0.2)' : '#ccc';
+            lineChart.options.scales.y.grid.color = isDarkMode ? 'rgba(255,255,255,0.2)' : '#ccc';
             lineChart.update();
+        }
+
+        if (barChart){
+            barChart.options.plugins.legend.labels.color = isDarkMode ? 'white' : '#333';
+            barChart.options.scales.x.ticks.color = isDarkMode ? 'white' : '#333';
+            barChart.options.scales.y.ticks.color = isDarkMode ? 'white' : '#333';
+            barChart.options.scales.x.grid.color = isDarkMode ? 'rgba(255,255,255,0.2)' : '#ccc';
+            barChart.options.scales.y.grid.color = isDarkMode ? 'rgba(255,255,255,0.2)' : '#ccc';
+            barChart.update();
+        }
+        if (donutChart) {
+            const textColor = isDarkMode ? 'white' : '#333';
+
+            donutChart.options.plugins.legend.labels.color = textColor;
+            donutChart.options.plugins.title.color = textColor; 
+            donutChart.update();
         }
     }
     </script>
-
+        
+    <script src="{% static 'js/line.js' %}"></script>
+    <script src="{% static 'js/bar.js' %}"></script>
+    <script src="{% static 'js/linesummary.js' %}"></script>
+    <script src="{% static 'js/transaction.js' %}"></script>
+    <script src="{% static 'js/sortable.js' %}"></script>
+    <script src ="{% static 'js/donut.js' %}"></script>
    
    

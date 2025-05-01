@@ -1,14 +1,13 @@
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded and parsed');
-    const donutCtx = document.getElementById('donut').getContext('2d');
-    console.log('donutCtx:', donutCtx);
+const myUniqueDonutCTX = document.getElementById('donut').getContext('2d');
 
-    new Chart(donutCtx, {
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    const text = isDarkMode ? 'white' : '#333';
+    donutChart = new Chart(myUniqueDonutCTX, {
         type: 'doughnut',
         data: {
-            labels: categories,
+            labels: categories, 
             datasets: [{
-                data: quantities,
+                data: quantities, 
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.4)',
                     'rgba(54, 162, 235, 0.2)',
@@ -29,12 +28,29 @@ document.addEventListener('DOMContentLoaded', function() {
             plugins: {
                 legend: {
                     position: 'bottom',
+                    labels: {
+                        color: text
+                    }
                 },
                 title: {
                     display: true,
-                    text: 'Total Sales per Product'
+                    text: 'Total Sales per Product',
+                    color: text,
+                },
+                tooltip: { 
+                    callbacks: {
+                        label: function (tooltipItem) {
+                            const dataset = this.chart.data.datasets[tooltipItem.datasetIndex];
+                            //get the sum of the quantites and iterates through the array
+                            //initially at zero 
+                            const total = dataset.data.reduce((sum, value) => sum + value, 0);
+                            const currentValue = dataset.data[tooltipItem.dataIndex];
+                            const percentage = Math.floor(((currentValue / total) * 100) + 0.5);
+                            return percentage + "%" + ',' + currentValue;
+                        }
+                    }
                 }
             }
         }
-    });
-});
+    });    
+    

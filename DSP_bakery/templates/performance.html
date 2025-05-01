@@ -88,10 +88,47 @@
         </div>
     </div>
     </div>
+   
+    {% comment %} <script src="{% static 'js/darkmode.js' %}"></script> {% endcomment %}
     <script src="{% static 'js/performance_graph.js' %}"></script>
     <script src="{% static 'js/quarter_sales.js' %}"></script>
     <script src="{% static 'js/bubble.js' %}"></script>
     <script src="{% static 'js/avgdeli.js' %}"></script>
+
+           
+
+    <script>
+        function toggleDarkMode() {
+            // Toggle dark mode class on the body
+            const isDarkMode = document.body.classList.toggle('dark-mode');
+            //store the theme in localStorage
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            //
+            if (window.barchart23) {
+                // Set the colors based on the theme
+                barchart23.options.plugins.title.color = isDarkMode ? 'white' : '#333';
+                barchart23.options.scales.x.ticks.color = isDarkMode ? 'white' : '#333';
+                barchart23.options.scales.y.ticks.color = isDarkMode ? 'white' : '#333';
+                barchart23.options.scales.x.grid.color = isDarkMode ? 'rgba(255,255,255,0.2)' : '#ccc';
+                barchart23.options.scales.y.grid.color = isDarkMode ? 'rgba(255,255,255,0.2)' : '#ccc';
+                barchart23.options.scales.x.title.color = isDarkMode ? 'white' : '#333';
+                barchart23.options.scales.y.title.color = isDarkMode ? 'white' : '#333';
+                barchart23.update();
+            }
+            if (window.scatterChart) {
+                // Set the colors based on the theme
+                scatterChart.options.plugins.title.color = isDarkMode ? 'white' : '#333';
+                scatterChart.options.scales.x.ticks.color = isDarkMode ? 'white' : '#333';
+                scatterChart.options.scales.y.ticks.color = isDarkMode ? 'white' : '#333';
+                scatterChart.options.scales.x.grid.color = isDarkMode ? 'rgba(255,255,255,0.2)' : '#ccc';
+                scatterChart.options.scales.y.grid.color = isDarkMode ? 'rgba(255,255,255,0.2)' : '#ccc';
+                scatterChart.options.scales.x.title.color = isDarkMode ? 'white' : '#333';
+                scatterChart.options.scales.y.title.color = isDarkMode ? 'white' : '#333';
+                scatterChart.update();
+            }
+            
+        }            
+    </script>
 </body>
 </html>
 
