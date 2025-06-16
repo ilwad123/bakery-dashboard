@@ -2,10 +2,11 @@
 
 ## 📌 Introduction
 
-The project is about creating a bakery delivery dashboard that presents real-time and predictive analytics with dynamic graphs, summary cards, and other visualisations to display the KPIs of delivery operations. A hybrid machine learning algorithm was made to forecast weekly sales from historical data.
+The project is about creating a bakery delivery dashboard that presents real-time and predictive analytics with dynamic graphs, summary cards, and other visualisations to display the KPIs of delivery operations. A hybrid CNN-LTSM machine learning algorithm was made to forecast weekly sales from historical data.
 
 The implementation process followed data cleaning of large datasets, applying the Neo4j database to store transaction and drivers’ data, and developing a secure, accessible full-stack web application in Django. The system allows stakeholders to monitor performance and view delivery sales data.
 
+Additionally it has dark mode 
 ---
 
 ## 🖥️ UI Screenshots
@@ -13,7 +14,7 @@ The implementation process followed data cleaning of large datasets, applying th
 Here are screenshots showcasing the main pages of the Bakery Delivery Dashboard:
 
 ### Dashboard Overview
-![Dashboard Overview](/dashboard part1.png)
+![Dashboard Overview](/dashboard_part1.png)
 
 ### Weekly Sales Forecast
 ![Weekly Sales Forecast](/predicted.png)
