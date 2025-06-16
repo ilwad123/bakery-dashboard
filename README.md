@@ -8,6 +8,26 @@ The implementation process followed data cleaning of large datasets, applying th
 
 ---
 
+## 🖥️ UI Screenshots
+
+Here are screenshots showcasing the main pages of the Bakery Delivery Dashboard:
+
+### Dashboard Overview
+![Dashboard Overview](assets/dashboard_overview.png)
+
+### Weekly Sales Forecast
+![Weekly Sales Forecast](assets/weekly_forecast.png)
+
+### Driver Performance
+![Driver Performance](assets/driver_performance.png)
+
+### Delivery Heatmap
+![Delivery Heatmap](assets/delivery_heatmap.png) 
+
+---
+
+
+
 ## 🔑 Key Features
 
 - 📊 Real-time dashboard visualising KPIs (sales, deliveries, driver activity)  
