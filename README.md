@@ -13,16 +13,16 @@ The implementation process followed data cleaning of large datasets, applying th
 Here are screenshots showcasing the main pages of the Bakery Delivery Dashboard:
 
 ### Dashboard Overview
-![Dashboard Overview](assets/dashboard_overview.png)
+![Dashboard Overview](/dashboard part1.png)
 
 ### Weekly Sales Forecast
-![Weekly Sales Forecast](assets/weekly_forecast.png)
+![Weekly Sales Forecast](/predicted.png)
 
 ### Driver Performance
-![Driver Performance](assets/driver_performance.png)
+![Driver Performance](/performance.png)
 
-### Delivery Heatmap
-![Delivery Heatmap](assets/delivery_heatmap.png) 
+### Login 
+![ Login](/login.png) 
 
 ---
 
