@@ -14,7 +14,9 @@ Additionally it has dark mode
 Here are screenshots showcasing the main pages of the Bakery Delivery Dashboard:
 
 ### Dashboard Overview
-![Dashboard Overview](/dashboard_part1.png)
+![Dashboard part1 Overview](/dashboard_part1.png)
+![Dashboard part2 Overview](/dashboard_part2.png)
+![Dashboard part3 Overview](/dashboard_part3.png)
 
 ### Weekly Sales Forecast
 ![Weekly Sales Forecast](/predicted.png)
