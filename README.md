@@ -16,18 +16,18 @@ Additionally, the dashboard supports a dark mode interface, enhancing usability 
 Here are screenshots showcasing the main pages of the Bakery Delivery Dashboard:
 
 ### Dashboard Overview
-![Dashboard part1 Overview](/dashboard_part1.png)
-![Dashboard part2 Overview](/dashboard_part2.png)
-![Dashboard part3 Overview](/dashboard_part3.png)
+![Dashboard part1 Overview](readme_image/dashboard_part1.png)
+![Dashboard part2 Overview](readme_image/dashboard_part2.png)
+![Dashboard part3 Overview](readme_image/dashboard_part3.png)
 
 ### Weekly Sales Forecast
-![Weekly Sales Forecast](/predicted.png)
+![Weekly Sales Forecast](readme_image/predicted.png)
 
 ### Driver Performance
-![Driver Performance](/performance.png)
+![Driver Performance](readme_image/performance.png)
 
 ### Login 
-![ Login](/login.png) 
+![Login](readme_image/login.png) 
 
 ### Dashboard in Dark Mode – user-friendly low-light theme for better accessibility
 ![Dashboard dark Overview](/dashboard_dark.png)
