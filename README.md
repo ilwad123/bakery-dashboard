@@ -30,7 +30,8 @@ Here are screenshots showcasing the main pages of the Bakery Delivery Dashboard:
 ![Login](readme_image/login.png) 
 
 ### Dashboard in Dark Mode – user-friendly low-light theme for better accessibility
-![Dashboard dark Overview](/dashboard_dark.png)
+![Dashboard dark Overview](readme_image/dashboard_dark.png)
+
 ---
 
 
