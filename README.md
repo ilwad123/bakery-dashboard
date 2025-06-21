@@ -4,11 +4,12 @@
 
 This project delivers a comprehensive Bakery Delivery Dashboard designed to monitor and analyse delivery operations through real-time and predictive analytics. The dashboard features dynamic graphs, summary cards, and various visualisations to display key performance indicators (KPIs) such as sales, deliveries, and driver activity.
 
-A hybrid CNN-LSTM machine learning model was developed to forecast weekly sales based on historical transaction data, providing actionable insights to optimise operations.
+A hybrid CNN-LSTM machine learning model was developed to forecast weekly sales based on historical transaction data, providing actionable insights to optimise operations.Users can also download detailed weekly sales prediction reports as PDFs for easy sharing and offline review.
 
 The implementation involved extensive data cleaning, leveraging Neo4j as a graph database to manage transactions and driver information efficiently, and building a secure, user-friendly full-stack web application using Django. This system enables stakeholders to track performance metrics and forecast sales effectively.
 
 Additionally, the dashboard supports a dark mode interface, enhancing usability for users who prefer a low-light theme.
+
 ---
 
 ## 🖥️ UI Screenshots
@@ -22,6 +23,21 @@ Here are screenshots showcasing the main pages of the Bakery Delivery Dashboard:
 
 ### Weekly Sales Forecast
 ![Weekly Sales Forecast](readme_image/predicted.png)
+
+### Download Weekly Sales Prediction PDF Report generation 
+
+Users can download a detailed PDF report summarising the weekly sales prediction along with key performance indicators (KPIs). This feature enables easy sharing and offline review of forecast data for managers to keep track of.
+
+
+[Download Sample PDF Report](readme_image/Predicted_Sales_Report_w_c_2024-05-03.pdf)
+
+
+*Example of the generated weekly sales prediction report showing key figures and charts.*
+
+The PDF report includes:  
+- Predicted revenue and sales figures  
+- Charts and graphs visualising forecasted trends  
+- A summary of key metrics for the predicted week
 
 ### Driver Performance
 ![Driver Performance](readme_image/performance.png)
@@ -40,11 +56,13 @@ Here are screenshots showcasing the main pages of the Bakery Delivery Dashboard:
 
 - 📊 Real-time dashboard visualising KPIs (sales, deliveries, driver activity)  
 - 🤖 Weekly sales prediction using a CNN + LSTM hybrid model  
+- 📄 Download weekly sales prediction report as a PDF — easily export and share forecast insights
 - 🧹 Extensive data cleaning and transformation from raw delivery datasets  
 - 🔗 Graph database (Neo4j) to model drivers, transactions, products, and locations  
 - 📦 Efficient driver batching algorithm using Google Maps API  
 - 🔐 Secure user authentication system with CAPTCHA  
 - 🌐 Full-stack Django web app with dynamic charts (Chart.js)  
+
 
 ---
 
@@ -141,7 +159,7 @@ Here are screenshots showcasing the main pages of the Bakery Delivery Dashboard:
 - Additional ML algorithm for product popularity and inventory planning  
 - Extend sales forecast to 30 days for better production and staffing decisions  
 - Route optimisation for drivers with heatmaps and API integration, visualised on maps  
-- Export reports as PDFs and implement searchable delivery transaction tables  
+- Export more reports as PDFs and implement searchable delivery transaction tables  
 - Deploy the application on cloud platforms like AWS, GCP, or Azure for scalability and availability  
 
 ---
