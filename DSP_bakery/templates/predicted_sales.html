@@ -7,6 +7,9 @@
     <link href="{% static 'css/predicted_sales.css' %}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
@@ -41,7 +44,7 @@
     <canvas id="predictionChart" height="900"width="2200"></canvas>
     </div>
 </div>
-    <button class="download_pdf">Download PDF</button>
+<button class="download_pdf">Download Weekly Prediction Report</button>
     <script>
         const predictedSales = JSON.parse('{{ predicted_sales|safe|escapejs }}');
         const labels = JSON.parse('{{ dates|safe|escapejs }}');
@@ -134,6 +137,11 @@
                                 color: isDarkMode ? 'white' : '#333',
                                 font: { size: 12 }
                             },
+                            title: {
+                                display: true,
+                                text: 'Date',
+                                color: isDarkMode ? 'white' : '#333'
+                            },
                             grid: {
                                 color: isDarkMode ? '#555' : '#ccc'
                             }
@@ -143,6 +151,11 @@
                             ticks: {
                                 color: isDarkMode ? 'white' : '#333',
                                 font: { size: 13 }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Total Sales (£)',
+                                color: isDarkMode ? 'white' : '#333'
                             },
                             grid: {
                                 color: isDarkMode ? '#555' : '#ccc'

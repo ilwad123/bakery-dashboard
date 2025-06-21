@@ -36,6 +36,16 @@ import pandas as pd
 
 from neo4j.time import DateTime as Neo4jDateTime
 
+#PDF generation imports 
+import base64
+import json
+from io import BytesIO
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.utils import ImageReader
+
 
 # Set up logging
 matplotlib.use('Agg')
@@ -136,6 +146,177 @@ def predict_sales_page(request):
         'previous_week_sales': json.dumps(current_week_sales_total)
     })
 
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
+from io import BytesIO
+import base64
+import json
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
+
+from io import BytesIO
+import base64, json
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
+from reportlab.lib import colors
+import re
+
+
+@csrf_exempt  # dev‑only; add proper CSRF in prod
+def predicted_sales_pdf(request):
+    if request.method != "POST":
+        return HttpResponse("Only POST allowed", status=405)
+
+    try:
+        data = json.loads(request.body)
+
+        chart_image_b64 = data.get("chart_image", "").split(",", 1)[1]
+        start_date      = data.get("start_date", "N/A")
+        revenue         = data.get("revenue", "N/A")
+
+        max_value       = data.get("max_value", "N/A")
+        max_day         = data.get("max_day", "N/A")
+        max_day_name    = data.get("max_day_name", "N/A")
+
+        min_value       = data.get("min_value", "N/A")
+        min_day         = data.get("min_day", "N/A")
+        min_day_name    = data.get("min_day_name", "N/A")
+
+        current_sales       = data.get("current_sales", "N/A")
+        percentage_change   = data.get("percentage_change", "N/A") 
+        kpi_message         = data.get("kpi_message", "")
+
+        chart_bytes = base64.b64decode(chart_image_b64)
+        chart_image = ImageReader(BytesIO(chart_bytes))
+
+        buffer = BytesIO()
+        pdf = canvas.Canvas(buffer, pagesize=A4)
+        width, height = A4
+
+        margin   = 50
+        y = height - 50  
+
+        # Title
+        pdf.setFont("Helvetica-Bold", 18)
+        pdf.drawString(margin, y, f"Predicted Sales Report (w/c {start_date})")
+        y = y - 40
+        
+        # kpi insight message
+        if kpi_message:
+            box_height = 30
+            box_padding = 5
+            box_width = 400
+            page_width = width 
+            
+            
+            kpi_message1 = [kpi_message.replace(',','.') for x in re.findall('\d*[,.]?\d*%', kpi_message)]
+            print(kpi_message1)
+
+            x= (page_width / 2) - (box_width / 2)  # Center the box horizontally
+            # Draw the box at (15, y - box_height + box_padding) so it wraps the text
+            pdf.setFillColor(colors.HexColor("#A9B8C8"))
+            pdf.roundRect(x , (y+12) - box_height + box_padding, box_width, box_height, 4, stroke=1, fill=1)
+
+            pdf.setFillColor(colors.black)
+            pdf.setFont("Helvetica", 12)
+            pdf.drawString((x + 6) , y, kpi_message)
+            y = y - (box_height + box_padding * 2)
+        else:
+            y = y - 20
+            
+        #seperator line
+        pdf.setStrokeColor(colors.grey)
+        pdf.setLineWidth(1)
+        pdf.line(margin, y, width - margin, y)
+        y = y - 30
+
+        # KPI Section
+        pdf.setFont("Helvetica-Bold", 13)
+        pdf.setFillColor(colors.HexColor("#34495E"))
+        pdf.drawString(margin, y, "Key Performance Indicators")
+        pdf.setFillColor(colors.black)
+        y = y - 25
+
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(margin, y, "Predicted Revenue:")
+        pdf.setFont("Helvetica", 12)
+        pdf.drawString(margin + 180, y, f"{revenue}")
+        y = y - 20
+
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(margin, y, "Current Week Sales:")
+        pdf.setFont("Helvetica", 12)
+        pdf.drawString(margin + 180, y, f"£{current_sales}")
+        y = y - 20
+
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(margin, y, "Highest Sales Value:")
+        pdf.setFont("Helvetica", 12)
+        pdf.drawString(margin + 180, y, f"£{max_value}")
+        y = y - 20
+
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(margin, y, "Day of Highest Sales:")
+        pdf.setFont("Helvetica", 12)
+        pdf.drawString(margin + 180, y, f"{max_day} ({max_day_name})")
+        y = y - 20
+
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(margin, y, "Lowest Sales Value:")
+        pdf.setFont("Helvetica", 12)
+        pdf.drawString(margin + 180, y, f"£{min_value}")
+        y = y - 20
+
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(margin, y, "Day of Lowest Sales:")
+        pdf.setFont("Helvetica", 12)
+        pdf.drawString(margin + 180, y, f"{min_day} ({min_day_name})")
+        y = y - 30
+
+
+        #seperator line
+        pdf.setStrokeColor(colors.grey)
+        pdf.setLineWidth(1)
+        pdf.line(margin, y, width - margin, y)
+        y = y - 30
+        
+
+        # Chart Title
+        pdf.setFont("Helvetica-Bold", 14)
+        pdf.drawString(margin, y, "Sales Prediction Chart")
+        y = y - 2
+
+        # Chart Image
+        chart_height = 300
+        pdf.drawImage(
+            chart_image,
+            margin,
+            y - chart_height,
+            width=width - 2 * margin,
+            height=chart_height,
+            preserveAspectRatio=True,
+            mask='auto'
+        )
+
+        # Footer
+        pdf.setFont("Helvetica-Oblique", 9)
+        pdf.setFillColor(colors.grey)
+        pdf.drawString(margin, 30, "Generated by Sales Prediction System")
+        pdf.drawRightString(width - margin, 30, f"Page {pdf.getPageNumber()}")
+
+        pdf.showPage()
+        pdf.save()
+
+        buffer.seek(0)
+        return HttpResponse(buffer, content_type="application/pdf")
+
+    except Exception as e:
+        return HttpResponse(f"Error generating PDF: {e}", status=500)
 
     
 @login_required(login_url="/login/")

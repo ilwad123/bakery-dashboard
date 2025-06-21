@@ -27,6 +27,6 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),  # Logout view
     path('predicted-sales/', views.predict_sales_page, name='predicted-sales'),
     path('performance/', views.performance_page, name='performance') ,# Performance page
-    # path('generate_pdf/', views.generate_pdf, name='generate_pdf'),  # Download PDF view
+    path("predicted-sales/pdf/", views.predicted_sales_pdf, name="predicted-sales-pdf"),
 ]
 
