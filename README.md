@@ -29,7 +29,7 @@ Here are screenshots showcasing the main pages of the Bakery Delivery Dashboard:
 Users can download a detailed PDF report summarising the weekly sales prediction along with key performance indicators (KPIs). This feature enables easy sharing and offline review of forecast data for managers to keep track of.
 
 
-[Download Sample PDF Report](readme_image/Predicted_Sales_Report_w_c_2024-05-03.pdf)
+[Download latest PDF Report](readme_image/Predicted_Sales_Report_w_c_2024-05-03.pdf)
 
 
 *Example of the generated weekly sales prediction report showing key figures and charts.*
