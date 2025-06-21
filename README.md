@@ -22,7 +22,7 @@ Here are screenshots showcasing the main pages of the Bakery Delivery Dashboard:
 ![Dashboard part3 Overview](readme_image/dashboard_part3.png)
 
 ### Weekly Sales Forecast
-![Weekly Sales Forecast](readme_image/predicted.png)
+![Weekly Sales Forecast](readme_image/predicted_new.png)
 
 ### Download Weekly Sales Prediction PDF Report generation 
 
