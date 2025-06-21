@@ -38,6 +38,7 @@ The PDF report includes:
 - Predicted revenue and sales figures  
 - Charts and graphs visualising forecasted trends  
 - A summary of key metrics for the predicted week
+- Highest days and lowest days and etc
 
 ### Driver Performance
 ![Driver Performance](readme_image/performance.png)
