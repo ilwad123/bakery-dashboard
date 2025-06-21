@@ -185,13 +185,13 @@ The original datasets (`sales.csv` and `price.csv`) were sourced from Kaggle and
 | Access delivery sales history in different page |      |                                                              |            |
 |                                 | FR8  | Access deliveries for specific day search function            | COULD      |
 |                                 | FR9  | Filter different products, places and categories and dates    | COULD      |
-|                                 | FR10 | Download the history as PDF                                    | WON’T HAVE |
+|                                 | FR10 | Download the history as PDF                                    | COULD |
 | Access predictions in the business on different page |      |                                                              |            |
 |                                 | FR11 | Add a summary card of projected revenue of the week and percentage change to current week | MUST       |
 |                                 | FR12 | Predict the next week sales trend in the future per day       | MUST       |
 |                                 | FR13 | Display the predictions as graphs and charts                  | MUST       |
 |                                 | FR14 | Optimise delivery routes for delivery workers using route APIs | COULD      |
-|                                 | FR15 | Generate reports as PDFs with sales and key points from the data | WON’T HAVE |
+|                                 | FR15 | Generate reports as PDFs with sales and key points from the data | MUST |
 | Access delivery workers information |      |                                                              |            |
 |                                 | FR16 | Display total deliveries per driver as a bar chart to compare individual performance | MUST       |
 |                                 | FR17 | Visualise driver efficiency using a scatter plot comparing sales per KM vs average delivery time | MUST       |
