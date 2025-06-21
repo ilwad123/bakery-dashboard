@@ -219,7 +219,7 @@ def predicted_sales_pdf(request):
 
             x= (page_width / 2) - (box_width / 2)  # Center the box horizontally
             # Draw the box at (15, y - box_height + box_padding) so it wraps the text
-            pdf.setFillColor(colors.HexColor("#A9B8C8"))
+            pdf.setFillColor(colors.HexColor("#F1E9C3"))
             pdf.roundRect(x , (y+12) - box_height + box_padding, box_width, box_height, 4, stroke=1, fill=1)
 
             pdf.setFillColor(colors.black)
@@ -296,7 +296,8 @@ def predicted_sales_pdf(request):
         pdf.drawImage(
             chart_image,
             margin,
-            y - chart_height,
+            y - chart_height + 20,
+            # y - chart_height,
             width=width - 2 * margin,
             height=chart_height,
             preserveAspectRatio=True,
