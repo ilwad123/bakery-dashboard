@@ -45,6 +45,8 @@ from django.views.decorators.csrf import csrf_exempt
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
+from reportlab.lib import colors
+import re
 
 
 # Set up logging
@@ -146,25 +148,6 @@ def predict_sales_page(request):
         'previous_week_sales': json.dumps(current_week_sales_total)
     })
 
-from reportlab.lib.pagesizes import A4
-from reportlab.lib import colors
-from reportlab.pdfgen import canvas
-from reportlab.lib.utils import ImageReader
-from io import BytesIO
-import base64
-import json
-from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse
-
-from io import BytesIO
-import base64, json
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-from reportlab.lib.utils import ImageReader
-from reportlab.lib import colors
-import re
 
 
 @csrf_exempt  # dev‑only; add proper CSRF in prod
